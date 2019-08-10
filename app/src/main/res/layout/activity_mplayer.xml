@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        style="@style/AppBaseTheme"
+        tools:context=".Activities.MPlayerActivity">
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_mplayer"
+            android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
+
+
+    <include
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/custom_appbar"/>
+
+
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/cv_mplayer_main"
+            style="@style/AppBaseTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/ll_mplayer_main"
+                android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/img_cover_art"
+                    android:layout_width="225dp"
+                    android:layout_height="225dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginTop="50dp"
+            />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_one"
+                    android:layout_marginTop="40dp"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_gravity="center"
+                              android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_song_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            style="?titleTextStyle"
+                            android:layout_marginBottom="10dp"
+                            android:text="God Only Knows"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/text_song_artist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:text="Tavish Barua"/>
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <view
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/btn_play_pause"
+                        android:background="@drawable/bg_circle"
+                        android:src="@mipmap/btn_play"
+                        android:padding="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_two"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:layout_marginTop="40dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="20dp"
+                              android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/songCurrentDurationLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:text="0:00"
+                            android:gravity="start"
+                            style="?text_color"/>
+                    <!-- Total Duration Label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/songTotalDurationLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:gravity="end"
+                            android:text="0:00"
+                            style="?text_color" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+                <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/seekBar1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="15dp"
+                        android:indeterminate="false"
+                        android:maxHeight="3dip"
+                        android:minHeight="3dip"
+                        android:thumbTint="@android:color/transparent"
+                        android:progressDrawable="@drawable/seekbar_progress"
+                         />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+            
+            <androidx.appcompat.widget.LinearLayoutCompat
+                  android:id="@+id/ll_mplayer_three"
+                    android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:weightSum="1">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_prev"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:layout_weight="0.5"
+                        android:src="@mipmap/btn_prev"/>
+
+                <View android:layout_width="40dp"
+                     android:layout_height="match_parent"
+                />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_next"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:layout_weight="0.5"
+                        android:src="@mipmap/btn_next"/>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.cardview.widget.CardView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/cv_mplayer_hidden"
+            android:layout_below="@+id/ll_mplayer"
+            android:layout_width="match_parent"
+            style="@style/darkTheme"
+            android:visibility="gone"
+            android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent"
+                      android:layout_height="wrap_content">
+
+            <include
+                    android:id="@+id/behind_mplayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/includer_mplayer_back"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+</RelativeLayout>

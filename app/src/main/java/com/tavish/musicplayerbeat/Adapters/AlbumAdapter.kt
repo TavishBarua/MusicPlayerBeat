@@ -1,0 +1,128 @@
+package com.tavish.musicplayerbeat.Adapters
+
+import android.content.ContentUris
+import android.content.Intent
+import android.media.MediaPlayer
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.RelativeLayout
+import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+import com.tavish.musicplayerbeat.Common
+import com.tavish.musicplayerbeat.Activities.MainActivity
+import com.tavish.musicplayerbeat.Fragments.AlbumFragment
+import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicCursor
+import com.tavish.musicplayerbeat.Models.AlbumDto
+import com.tavish.musicplayerbeat.Models.BeatDto
+import com.tavish.musicplayerbeat.R
+import com.tavish.musicplayerbeat.Utils.Constants
+import com.tavish.musicplayerbeat.Utils.MusicUtils
+import kotlinx.android.synthetic.main.placeholder_album_item.view.*
+import java.util.ArrayList
+
+class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>(), View.OnClickListener {
+
+
+    private var songList: MutableList<AlbumDto>? = null
+    private val mAlbumFragment:AlbumFragment? = albumFragment
+    val mWidth = Common.getItemWidth()
+
+
+
+    companion object {
+        val mediaPlayer: MediaPlayer = MediaPlayer()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
+        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_album_item,parent,false)
+        return AlbumViewHolder(view)
+    }
+
+
+    fun updateData(data: MutableList<AlbumDto>?) {
+        this.songList = data
+        notifyDataSetChanged()
+    }
+
+
+
+    override fun getItemCount(): Int {
+        return songList?.size ?: 0
+    }
+
+    override fun onBindViewHolder(albumViewHolder: AlbumViewHolder, pos: Int) {
+
+        //  myViewHolder.itemView.txt_title.isSelected=true
+        albumViewHolder.bindItems(songList!![pos])
+
+    }
+
+    override fun onClick(v: View?) {
+
+        /*if(v?.id==R.id.overflow){
+            mAlbumFragment
+        }*/
+
+
+
+    }
+
+    inner class AlbumViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!), AdapterView.OnItemClickListener {
+
+
+
+
+        fun bindItems(item: AlbumDto) {
+            itemView.gridViewTitleText.text=item._album
+            itemView.gridViewSubText.text=item._artist
+
+
+
+            val params = itemView.grid_Img_Album.layoutParams as RelativeLayout.LayoutParams
+            params.width = mWidth
+            params.height = mWidth
+            itemView.grid_Img_Album.layoutParams = params
+
+            Picasso.get()
+                .load(MusicUtils.getAlbumArtUri(songList?.get(position)?._id!!).toString())
+                .fit()
+                .centerCrop()
+                .placeholder(R.mipmap.icn_beatdrop)
+                .into(itemView.grid_Img_Album)
+
+            //  val iv_song_img by lazy<TextView?> { itemView?.findViewById(R.id.img_song) }
+        }
+
+
+
+        @Suppress("NAME_SHADOWING")
+        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val id:Int=view!!.id
+            when(id){
+                R.id.placeholder_album_cardview->{
+                    val intent= Intent(view.context, MainActivity::class.java)
+                    intent.putExtra("pos", position)
+                }
+            }
+            if (mAlbumFragment?.IsAlbumEmpty
+                    (MusicCursor.getSongsSelection("ALBUMS",""+songList?.get(adapterPosition)?._id),adapterPosition)!!)
+                    return
+
+            val bundle=Bundle()
+            bundle.putString(Constants.HEADER_TITLE,songList?.get(adapterPosition)?._album)
+            bundle.putString(Constants.HEADER_SUB_TITLE,songList?.get(adapterPosition)?._artist)
+            bundle.putString(Constants.FROM_WHERE,"ALBUMS")
+            bundle.putLong(Constants.SELECTION_VALUE,songList?.get(adapterPosition)?._id!!)
+
+
+
+        }
+
+
+
+    }
+
+}

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                                   android:layout_width="match_parent"
+                                   android:minHeight="?attr/actionBarSize"
+                                   android:layout_height="wrap_content"
+                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                   android:orientation="horizontal"
+                                   android:weightSum="1"
+                                   android:contentInsetLeft="0dp"
+                                   android:contentInsetStart="0dp"
+                                   app:contentInsetLeft="0dp"
+                                   app:contentInsetStart="0dp"
+                                   android:contentInsetRight="0dp"
+                                   android:contentInsetEnd="0dp"
+                                   app:contentInsetRight="0dp"
+                                   app:contentInsetEnd="0dp"
+                                   app:theme="@style/AppTheme.ActionBar">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/custom_toolbar"
+            android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:src="@mipmap/btn_back"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_weight="0.6"
+                android:text="Songs"
+                style="@style/AppTheme.ActionBar.TitleText" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_side_menu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:src="@mipmap/btn_side_menu" />
+
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.appcompat.widget.Toolbar>

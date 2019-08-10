@@ -1,0 +1,64 @@
+<resources>
+
+    
+    <!-- Base application theme. -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/velvet_white</item>
+        <item name="colorPrimaryDark">@color/smooth_violet</item>
+        <item name="android:textColorPrimary">@color/light_brown</item>
+        <item name="android:textColor">@color/light_brown</item>
+        <item name="android:windowBackground">@color/velvet_white</item>
+
+        <!--Text color-->
+        <!-- <item name="bg_color">@color/velvet_white</item>
+         <item name="text_color">@color/light_brown</item>
+         <item name="small_text_color">@color/smooth_violet</item>
+         <item name="button_color">@color/bright_orange</item>-->
+        <item name="android:fontFamily">@font/opensansregular</item>
+
+    </style>
+
+
+    <style name="darkTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/smooth_violet</item>
+        <item name="colorPrimaryDark">@color/smooth_violet</item>
+        <item name="android:textColorPrimary">@color/velvet_white</item>
+        <item name="android:textColor">@color/velvet_white</item>
+        <item name="android:windowBackground">@color/smooth_violet</item>
+      <!--  &lt;!&ndash;Text color&ndash;&gt;
+        <item name="bg_color">@color/smooth_violet</item>
+        <item name="text_color">@color/velvet_white</item>
+        <item name="small_text_color">@color/velvet_white</item>
+        <item name="button_color">@color/bright_orange</item>
+        <item name="android:fontFamily">@font/opensansregular</item>-->
+
+    </style>
+
+    
+
+
+    <!--Custom app bar white/dark theme-->
+    <style name="CustomAppBarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="android:background">@color/velvet_white</item>
+        <item name="android:windowBackground">@color/velvet_white</item>
+        <item name="android:colorBackground">@color/velvet_white</item>
+    </style>
+
+    <style name="AppTheme.ActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleText</item>
+        <item name="titleTextStyle">@style/AppTheme.ActionBar.TitleText</item>
+    </style>
+
+    <style name="AppTheme.ActionBar.TitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/opensansregular</item>
+        <item name="text_color">@color/light_brown</item>
+        <item name="android:windowBackground">@color/velvet_white</item>
+    </style>
+
+
+</resources>
