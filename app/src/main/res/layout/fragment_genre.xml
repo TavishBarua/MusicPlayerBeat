@@ -5,10 +5,10 @@
              android:layout_height="match_parent"
              tools:context=".Fragments.GenreFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <androidx.appcompat.widget.AppCompatTextView
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rr_genres"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/hello_blank_fragment"/>
+            android:layout_height="match_parent">
+    </androidx.recyclerview.widget.RecyclerView>
 
 </androidx.appcompat.widget.ContentFrameLayout>

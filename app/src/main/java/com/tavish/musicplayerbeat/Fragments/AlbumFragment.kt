@@ -112,7 +112,6 @@ class AlbumFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object: DisposableObserver<MutableList<AlbumDto>>(){
                 override fun onComplete() {
-
                 }
 
                 override fun onNext(data: MutableList<AlbumDto>) {
@@ -125,15 +124,10 @@ class AlbumFragment : Fragment() {
                     Log.d("FAILED", "" + e.message)
                 }
 
-
             })
         )
 
     }
-
-
-
-
 
 
     fun IsAlbumEmpty(songs: MutableList<SongDto> , pos:Int):Boolean{

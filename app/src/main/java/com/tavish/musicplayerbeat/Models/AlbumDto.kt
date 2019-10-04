@@ -35,12 +35,12 @@ class AlbumDto(
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<SongDto> {
-        override fun createFromParcel(parcel: Parcel): SongDto {
-            return SongDto(parcel)
+    companion object CREATOR : Parcelable.Creator<AlbumDto> {
+        override fun createFromParcel(parcel: Parcel): AlbumDto {
+            return AlbumDto(parcel)
         }
 
-        override fun newArray(size: Int): Array<SongDto?> {
+        override fun newArray(size: Int): Array<AlbumDto?> {
             return arrayOfNulls(size)
         }
     }

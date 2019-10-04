@@ -10,21 +10,21 @@ import android.widget.AdapterView
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Activities.MainActivity
-import com.tavish.musicplayerbeat.Fragments.AlbumFragment
+import com.tavish.musicplayerbeat.Common
+import com.tavish.musicplayerbeat.Fragments.GenreFragment
 import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicCursor
-import com.tavish.musicplayerbeat.Models.AlbumDto
+import com.tavish.musicplayerbeat.Models.GenreDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
 import com.tavish.musicplayerbeat.Utils.MusicUtils
 import kotlinx.android.synthetic.main.placeholder_grid_item.view.*
 
-class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>(), View.OnClickListener {
+class GenreAdapter(genreFragment: GenreFragment): RecyclerView.Adapter<GenreAdapter.GenreViewHolder>(), View.OnClickListener {
 
 
-    private var songList: MutableList<AlbumDto>? = null
-    private val mAlbumFragment:AlbumFragment? = albumFragment
+    private var genreList: MutableList<GenreDto>? = null
+    private val mGenreFragment: GenreFragment? = genreFragment
     val mWidth = Common.getItemWidth()
 
 
@@ -33,27 +33,25 @@ class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdap
         val mediaPlayer: MediaPlayer = MediaPlayer()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenreViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_grid_item,parent,false)
-        return AlbumViewHolder(view)
+        return GenreViewHolder(view)
     }
 
 
-    fun updateData(data: MutableList<AlbumDto>?) {
-        this.songList = data
+    fun updateData(data: MutableList<GenreDto>?) {
+        this.genreList = data
         notifyDataSetChanged()
     }
 
-
-
     override fun getItemCount(): Int {
-        return songList?.size ?: 0
+        return genreList?.size ?: 0
     }
 
-    override fun onBindViewHolder(albumViewHolder: AlbumViewHolder, pos: Int) {
+    override fun onBindViewHolder(genreViewHolder: GenreViewHolder, pos: Int) {
 
         //  myViewHolder.itemView.txt_title.isSelected=true
-        albumViewHolder.bindItems(songList!![pos])
+        genreViewHolder.bindItems(genreList!![pos])
 
     }
 
@@ -62,21 +60,13 @@ class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdap
         /*if(v?.id==R.id.overflow){
             mAlbumFragment
         }*/
-
-
-
     }
 
-    inner class AlbumViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!), AdapterView.OnItemClickListener {
+    inner class GenreViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!), AdapterView.OnItemClickListener {
 
-
-
-
-        fun bindItems(item: AlbumDto) {
-            itemView.gridViewTitleText.text=item._album
-            itemView.gridViewSubText.text=item._artist
-
-
+        fun bindItems(item: GenreDto) {
+            itemView.gridViewTitleText.text=item._genreName
+            itemView.gridViewSubText.text=item._noOfAlbumsInGenre.toString()
 
             val params = itemView.grid_Img_Album.layoutParams as RelativeLayout.LayoutParams
             params.width = mWidth
@@ -84,7 +74,7 @@ class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdap
             itemView.grid_Img_Album.layoutParams = params
 
             Picasso.get()
-                .load(MusicUtils.getAlbumArtUri(songList?.get(position)?._id!!).toString())
+                .load(MusicUtils.getAlbumArtUri(genreList?.get(position)?._genreId!!).toString())
                 .fit()
                 .centerCrop()
                 .placeholder(R.mipmap.icn_beatdrop)
@@ -104,15 +94,16 @@ class AlbumAdapter(albumFragment: AlbumFragment): RecyclerView.Adapter<AlbumAdap
                     intent.putExtra("pos", position)
                 }
             }
-            if (mAlbumFragment?.IsAlbumEmpty
-                    (MusicCursor.getSongsSelection("ALBUMS",""+songList?.get(adapterPosition)?._id),adapterPosition)!!)
-                    return
+            if (mGenreFragment?.IsAlbumsEmpty
+                    (MusicCursor.getAlbumsSelection("GENRES",""+genreList?.get(adapterPosition)?._genreId),adapterPosition)!!)
+                return
 
-            val bundle=Bundle()
-            bundle.putString(Constants.HEADER_TITLE,songList?.get(adapterPosition)?._album)
-            bundle.putString(Constants.HEADER_SUB_TITLE,songList?.get(adapterPosition)?._artist)
-            bundle.putString(Constants.FROM_WHERE,"ALBUMS")
-            bundle.putLong(Constants.SELECTION_VALUE,songList?.get(adapterPosition)?._id!!)
+            val bundle= Bundle()
+            bundle.putString(Constants.HEADER_TITLE,genreList?.get(adapterPosition)?._genreName)
+            genreList?.get(adapterPosition)?._noOfAlbumsInGenre?.let { bundle.putInt(Constants.HEADER_SUB_TITLE, it) }
+            bundle.putString(Constants.FROM_WHERE,"GENRES")
+            genreList?.get(adapterPosition)?._genreAlbumArt?.let { bundle.putString(Constants.COVER_PATH, it) }
+            bundle.putLong(Constants.SELECTION_VALUE,genreList?.get(adapterPosition)?._genreId!!)
 
 
 

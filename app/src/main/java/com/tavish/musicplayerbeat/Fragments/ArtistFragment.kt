@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tavish.musicplayerbeat.Adapters.ArtistAdapter
 import com.tavish.musicplayerbeat.Common
@@ -41,9 +42,11 @@ class ArtistFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mContext=context
+        mApp=mContext?.applicationContext as Common
         setHasOptionsMenu(true)
-        compositeDisposable= CompositeDisposable()
         mArtistAdapter= ArtistAdapter(this)
+        compositeDisposable= CompositeDisposable()
+
 
 
     }
@@ -53,8 +56,10 @@ class ArtistFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        val numberColumns=Common.getNumberOfColumns
         mView = inflater.inflate(R.layout.fragment_artist, container, false)
         mRecyclerView= mView.findViewById(R.id.rr_artists)
+        mRecyclerView.layoutManager = GridLayoutManager(mContext, numberColumns)
         mRecyclerView.adapter=mArtistAdapter
         return mView
     }
@@ -77,20 +82,21 @@ class ArtistFragment : Fragment() {
                     mArtistList=data
                     mArtistAdapter.updateData(mArtistList)
                     mArtistAdapter.notifyDataSetChanged()
-
                 }
 
                 override fun onError(e: Throwable) {
                     Log.d("FAILED", "" + e.message)
                 }
             })
-
-
         )
-
     }
 
-    fun IsArtistEmpty(albums:MutableList<AlbumDto>, pos:Int):Boolean{
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable?.dispose()
+    }
+
+    fun IsAlbumsEmpty(albums:MutableList<AlbumDto>, pos:Int):Boolean{
         if(albums.size==0){
             mArtistList?.removeAt(pos)
             mArtistAdapter.updateData(mArtistList)

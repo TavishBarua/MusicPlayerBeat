@@ -5,8 +5,11 @@ import android.content.res.Resources
 import androidx.annotation.NonNull
 import androidx.multidex.MultiDexApplication
 import com.tavish.musicplayerbeat.DB.DBHelper
+import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicService
+import com.tavish.musicplayerbeat.Helpers.PlaybackHelper.Playback
 import com.tavish.musicplayerbeat.Models.AlbumDto
 import com.tavish.musicplayerbeat.Models.ArtistDto
+import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.LARGE_TABLET
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.LARGE_TABLET_LANDSCAPE
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.LARGE_TABLET_PORTRAIT
@@ -21,9 +24,12 @@ import com.tavish.musicplayerbeat.Utils.Constants.Companion.SMALL_TABLET_PORTRAI
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.XLARGE_TABLET
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.XLARGE_TABLET_LANDSCAPE
 import com.tavish.musicplayerbeat.Utils.Constants.Companion.XLARGE_TABLET_PORTRAIT
+import com.tavish.musicplayerbeat.Utils.Logger
+import java.lang.Exception
+import java.util.ArrayList
 
 
- class Common: MultiDexApplication() {
+class Common: MultiDexApplication() {
 
 
 
@@ -31,9 +37,18 @@ import com.tavish.musicplayerbeat.Utils.Constants.Companion.XLARGE_TABLET_PORTRA
         mContext=context
     }*/
 
+     private var mPlayback: Playback? = null
 
 
-     companion object{
+     var mService: MusicService?=null
+
+
+    private var mIsServiceRunning = false
+
+
+
+
+    companion object{
                 /**
          * Returns the orientation of the device.
          */
@@ -134,19 +149,82 @@ import com.tavish.musicplayerbeat.Utils.Constants.Companion.XLARGE_TABLET_PORTRA
             return result
         }
 
+        fun convertMillisToSecs(milliseconds:Int):String{
+
+            val secondsValue = milliseconds / 1000 % 60
+            val minutesValue = milliseconds / (1000 * 60) % 60
+            val hoursValue = milliseconds / (1000 * 60 * 60) % 24
+
+            var seconds = ""
+            var minutes = ""
+            var hours = ""
+
+            if (secondsValue < 10) {
+                seconds = "0$secondsValue"
+            } else {
+                seconds = "" + secondsValue
+            }
+
+            if (minutesValue < 10) {
+                minutes = "0$minutesValue"
+            } else {
+                minutes = "" + minutesValue
+            }
+
+            if (hoursValue < 10) {
+                hours = "0$hoursValue"
+            } else {
+                hours = "" + hoursValue
+            }
+
+            var output = ""
+            if (hoursValue != 0) {
+                output = "$hours:$minutes:$seconds"
+            } else {
+                output = "$minutes:$seconds"
+            }
+
+            return output
+
+        }
+
 
      }
      override fun onCreate() {
          super.onCreate()
          commonInstance=applicationContext
+         mPlayback = Playback(commonInstance!!)
 
 
      }
+
+
+
+
+
+
+
+
+
+
+     fun isServiceRunning(): Boolean {
+         return mIsServiceRunning
+     }
+
+     fun setIsServiceRunning(running: Boolean) {
+         mIsServiceRunning = running
+     }
+
 
 
 
      fun getDBAccessHelper(): DBHelper {
         return DBHelper.getDBHelper(commonInstance!!)
     }
+
+
+     fun getPlayBackStarter(): Playback {
+         return mPlayback!!
+     }
 }
 

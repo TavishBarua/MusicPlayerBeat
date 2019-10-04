@@ -42,7 +42,6 @@ object MusicCursor {
                 null,
                 MediaStore.Audio.Genres.NAME
             )
-
             try {
                 common.getDBAccessHelper().writableDatabase.delete(DBHelper.GENRES_TABLE,null,null)
                 if (cursor!=null&&cursor.moveToNext()){
@@ -87,12 +86,12 @@ object MusicCursor {
                   do {
                     val artist=ContentValues()
                     artist.put(DBHelper.ARTIST_ID, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
-                    artist.put(DBHelper.ARTIST_NAME, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
-                    artist.put(DBHelper.NO_OF_TRACKS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
-                    artist.put(DBHelper.NO_OF_ALBUMS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
+                    artist.put(DBHelper.ARTIST_NAME, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST)))
+                    artist.put(DBHelper.NO_OF_TRACKS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)))
+                    artist.put(DBHelper.NO_OF_ALBUMS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS)))
 
                       val albums = getAlbumsSelection(
-                          "ARTIST",
+                          "ARTISTS",
                           artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID))
                       )
                     if (albums!=null && albums.size>0){
@@ -108,7 +107,7 @@ object MusicCursor {
 
                   }while (artistCursor.moveToNext());
 
-
+                        artistCursor.close()
                 }
 
 
@@ -121,7 +120,8 @@ object MusicCursor {
                 SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.FIRST_LAUNCH,false)
             }
 
-            cursor?.close()
+           // cursor?.close()
+
             return true
 
 

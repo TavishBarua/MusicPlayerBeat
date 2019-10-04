@@ -27,7 +27,12 @@
 
     <string name="open_settings">Open Settings</string>
 
+    <string name="unable_to_get_audio_focus">Unable to get audio focus.</string>
+
     <string name="no_albums_by_this_artist">No Albums by this artist.</string>
+    <string name="will_be_played_next">will be played next.</string>
+    <string name="added_to_queue"> added to queue.</string>
+    <string name="queue_is_empty">Queue is empty.</string>
 
 </resources>
 

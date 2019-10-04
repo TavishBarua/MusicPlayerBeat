@@ -12,14 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.tavish.musicplayerbeat.Activities.MainActivity
 import com.tavish.musicplayerbeat.Common
-import com.tavish.musicplayerbeat.Fragments.AlbumFragment
 import com.tavish.musicplayerbeat.Fragments.ArtistFragment
 import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicCursor
 import com.tavish.musicplayerbeat.Models.ArtistDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
 import com.tavish.musicplayerbeat.Utils.MusicUtils
-import kotlinx.android.synthetic.main.placeholder_album_item.view.*
+import kotlinx.android.synthetic.main.placeholder_grid_item.view.*
 
 class ArtistAdapter(artistFragment: ArtistFragment): RecyclerView.Adapter<ArtistAdapter.ArtistViewHolder>(), View.OnClickListener {
 
@@ -35,7 +34,7 @@ class ArtistAdapter(artistFragment: ArtistFragment): RecyclerView.Adapter<Artist
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {
-        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_album_item,parent,false)
+        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_grid_item,parent,false)
         return ArtistViewHolder(view)
     }
 
@@ -61,22 +60,13 @@ class ArtistAdapter(artistFragment: ArtistFragment): RecyclerView.Adapter<Artist
         /*if(v?.id==R.id.overflow){
             mAlbumFragment
         }*/
-
-
-
     }
 
     inner class ArtistViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!), AdapterView.OnItemClickListener {
 
-
-
-
         fun bindItems(item: ArtistDto) {
             itemView.gridViewTitleText.text=item._artistName
             itemView.gridViewSubText.text=item._noOfAlbumsByArtist.toString()
-
-
-
 
             val params = itemView.grid_Img_Album.layoutParams as RelativeLayout.LayoutParams
             params.width = mWidth
@@ -104,14 +94,14 @@ class ArtistAdapter(artistFragment: ArtistFragment): RecyclerView.Adapter<Artist
                     intent.putExtra("pos", position)
                 }
             }
-            if (mArtistFragment?.IsArtistEmpty
+            if (mArtistFragment?.IsAlbumsEmpty
                     (MusicCursor.getAlbumsSelection("ARTISTS",""+artistList?.get(adapterPosition)?._artistId),adapterPosition)!!)
                 return
 
             val bundle= Bundle()
             bundle.putString(Constants.HEADER_TITLE,artistList?.get(adapterPosition)?._artistName)
             artistList?.get(adapterPosition)?._noOfAlbumsByArtist?.let { bundle.putInt(Constants.HEADER_SUB_TITLE, it) }
-            bundle.putString(Constants.FROM_WHERE,"ALBUMS")
+            bundle.putString(Constants.FROM_WHERE,"ARTISTS")
             artistList?.get(adapterPosition)?._noOfAlbumsByArtist?.let { bundle.putInt(Constants.COVER_PATH, it) }
             bundle.putLong(Constants.SELECTION_VALUE,artistList?.get(adapterPosition)?._artistId!!)
 

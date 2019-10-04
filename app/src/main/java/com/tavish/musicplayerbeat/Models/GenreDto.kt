@@ -4,30 +4,25 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.tavish.musicplayerbeat.Utils.MParcelable
 
-class ArtistDto(
-    var _artistId: Long?,
-    var _artistName: String?,
-    var _artistAlbumArt: String?,
-    var _noOfTracksByArtist: Int?,
-    var _noOfAlbumsByArtist: Int?
+class GenreDto(
+    var _genreId: Long?,
+    var _genreName: String?,
+    var _genreAlbumArt: String?,
+    var _noOfAlbumsInGenre: Int?
 ) : MParcelable,Cloneable {
 
     constructor(parcel: Parcel) : this(
         parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readString(),
         parcel.readString(),
-        parcel.readValue(Long::class.java.classLoader) as? Int,
         parcel.readValue(Long::class.java.classLoader) as? Int
-
-
     )
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeValue(_artistId)
-        dest.writeString(_artistName)
-        dest.writeValue(_artistAlbumArt)
-        dest.writeValue(_noOfTracksByArtist)
-        dest.writeValue(_noOfAlbumsByArtist)
+        dest.writeValue(_genreId)
+        dest.writeString(_genreName)
+        dest.writeValue(_genreAlbumArt)
+        dest.writeValue(_noOfAlbumsInGenre)
     }
 
     @Throws(CloneNotSupportedException::class)
@@ -39,12 +34,12 @@ class ArtistDto(
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<ArtistDto> {
-        override fun createFromParcel(parcel: Parcel): ArtistDto {
-            return ArtistDto(parcel)
+    companion object CREATOR : Parcelable.Creator<GenreDto> {
+        override fun createFromParcel(parcel: Parcel): GenreDto {
+            return GenreDto(parcel)
         }
 
-        override fun newArray(size: Int): Array<ArtistDto?> {
+        override fun newArray(size: Int): Array<GenreDto?> {
             return arrayOfNulls(size)
         }
     }
