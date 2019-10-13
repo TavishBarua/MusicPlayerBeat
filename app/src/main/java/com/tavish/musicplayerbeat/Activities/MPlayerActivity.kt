@@ -76,7 +76,7 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
 
 
     private var mRecyclerViewPagerAdapter: PlayerPagerAdapter? = null
-        private var mViewPager: ViewPager? = null
+   //     private var mViewPager: ViewPager? = null
         private var mSongViewer: DiscreteScrollView? = null
     // Application Context
     private var mApp: Common? = null
@@ -414,7 +414,7 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             mRecyclerViewPagerAdapter = PlayerPagerAdapter(this)
             mSongViewer?.apply {
                 adapter = mRecyclerViewPagerAdapter
-                setOffscreenItems(3);
+                setOffscreenItems(0);
                 setItemTransitionTimeMillis(35);
                 setItemTransformer(ScaleTransformer.Builder().setMinScale(0.8f).build())
                 addOnItemChangedListener(mPageChangeListener)
@@ -431,10 +431,11 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             }*/
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
             if (mApp?.isServiceRunning()!!)
-                mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
+               // mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
+                mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
             else {
                 val pos = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.CURRENT_SONG_POSITION, 0)
-                mViewPager?.setCurrentItem(pos, false)
+                mSongViewer?.scrollToPosition(pos)
             }
 
             /*  val fadeAnimation = FadeAnimation(mVelocityViewPager, 600, 0.0f, 1.0f, DecelerateInterpolator(2.0f))
@@ -444,7 +445,7 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             ex.printStackTrace()
         }
 
-        Handler().postDelayed({ mViewPager?.offscreenPageLimit = 10 }, 1000)
+        Handler().postDelayed({ mSongViewer?.setOffscreenItems(3) }, 1000)
 
 
     }
@@ -457,7 +458,11 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
 
     val mPageChangeListener = object :DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder> {
         override fun onCurrentItemChanged(p0: RecyclerView.ViewHolder?, pos: Int) {
-            mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 200)
+            if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size != 1) {
+                if (pos != mApp?.mService?.mSongPos) {
+                        mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 200)
+                }
+            }
         }
 
 
