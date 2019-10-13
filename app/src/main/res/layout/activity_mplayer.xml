@@ -33,11 +33,11 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-        <androidx.viewpager.widget.ViewPager
+        <com.yarolegovich.discretescrollview.DiscreteScrollView
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerInParent="true"/>
 
         <androidx.cardview.widget.CardView
                 android:id="@+id/cv_mplayer_main"
@@ -54,13 +54,13 @@
                     android:orientation="vertical">
 
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <RelativeLayout
                         android:id="@+id/ll_play_pause"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="15dp"
                         android:layout_gravity="center"
                         android:orientation="horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_circle">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -68,17 +68,17 @@
                             android:padding="5dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
                             android:background="?selectableItemBackground"
                             app:srcCompat="@drawable/pause"/>
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </RelativeLayout>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/ll_two"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="40dp">
+                        android:orientation="vertical">
 
                     <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent"
                                                                   android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_gravity="center"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="10dp"
                         android:weightSum="1">
 
                     <androidx.appcompat.widget.AppCompatImageButton

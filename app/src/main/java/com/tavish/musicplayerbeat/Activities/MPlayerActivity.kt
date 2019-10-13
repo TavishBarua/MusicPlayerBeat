@@ -11,10 +11,10 @@ import android.view.View
 import android.view.animation.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.tavish.musicplayerbeat.Adapters.PlayerPagerAdapter
@@ -24,58 +24,67 @@ import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
+import com.yarolegovich.discretescrollview.DiscreteScrollView
+import com.yarolegovich.discretescrollview.transform.ScaleTransformer
+import kotlinx.android.synthetic.main.activity_mplayer.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
 
 
-class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
+class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder>, View.OnClickListener {
+
+
+
+
 
 
     // private val cardView_hidden by binder<CardView>(R.id.cv_mplayer_hidden)
     private val cardView_main by binder<CardView>(R.id.cv_mplayer_main)
     private val btn_next by binder<ImageButton>(R.id.btn_next)
     private val img_play_pause by binder<ImageView>(R.id.img_play_pause)
-
-    private val ll_play_pause by binder<LinearLayoutCompat>(R.id.ll_play_pause)
-
+    private val rr_play_pause by binder<RelativeLayout>(R.id.ll_play_pause)
 
     private val tv_current_duration by binder<TextView>(R.id.songCurrentDurationLabel)
+
+
     private val tv_total_duration by binder<TextView>(R.id.songTotalDurationLabel)
-
-
     private val mSeekBar by binder<SeekBar>(R.id.seekBar1)
+
 
     private val mToolBar by binder<Toolbar>(R.id.toolbar)
 
     private val mAppBarLayout by binder<AppBarLayout>(R.id.id_toolbar_container)
 
-
     //private val view_custom_toolbar by binder<View>(R.id.custom_toolbar)
     lateinit var readWriteSongPermissionHandler: RequestPermissionHandler
+
+
     var songList: MutableList<BeatDto> = mutableListOf()
     lateinit var songManager: SongManager
-
-
     var sharedPreferences: SharedPreferences? = null
+
+
     lateinit var editor: SharedPreferences.Editor
     var file = Environment.getDataDirectory()
     val storage_check_pref = "intent_memory"
     val song_list_pref = "intent_songs"
     var current_memory: Float = 0.0f
-
     var mFragments: MutableList<Fragment>? = null
+
     var mSongs: MutableList<SongDto>? = null
-
-
     private var mHandler: Handler? = null
-    private var mViewPagerAdapter: PlayerPagerAdapter? = null
-    private var mViewPager: ViewPager? = null
 
 
+    private var mRecyclerViewPagerAdapter: PlayerPagerAdapter? = null
+        private var mViewPager: ViewPager? = null
+        private var mSongViewer: DiscreteScrollView? = null
     // Application Context
     private var mApp: Common? = null
+
+
     private var mContext: Context? = null
     private var isUserScroll = true
+    private var USER_SCROLL: Boolean? = true
 
     private var jobStart: Job? = null
 
@@ -83,6 +92,8 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         val mediaPlayer: MediaPlayer = MediaPlayer()
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +112,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mViewPager = findViewById(R.id.viewPager)
+        mSongViewer = findViewById(R.id.viewPager)
 
 
 
@@ -122,14 +133,16 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         params.bottomMargin = 0
         mAppBarLayout.layoutParams = params
 
-        ll_play_pause.setOnClickListener(this)
+        rr_play_pause.setOnClickListener(this)
+        btn_next.setOnClickListener(this)
+        btn_prev.setOnClickListener(this)
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
 
-        mViewPagerAdapter = null
+        mRecyclerViewPagerAdapter = null
         Log.d("DESTROYED", "DESTROYED")
 
     }
@@ -165,7 +178,27 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.btn_next -> {
+                var newPos = mSongViewer?.currentItem?.plus(1)
+                if (newPos!! < mRecyclerViewPagerAdapter?.itemCount!!) {
+                  //  mViewPager?.setCurrentItem(newPos, true)
+                    mSongViewer?.scrollToPosition(newPos)
+                }else{
+                    Toast.makeText(mContext, "No Songs to Skip.", Toast.LENGTH_SHORT).show()
+                }
 
+            }
+
+            R.id.btn_prev -> {
+               // var newPos = mViewPager?.currentItem?.minus(1)
+                var newPos = mSongViewer?.currentItem?.minus(1)
+                if (newPos!! > -1) {
+                 //   mViewPager?.setCurrentItem(newPos, true)
+                    mSongViewer?.scrollToPosition(newPos)
+                }else{
+                    // doubt in this line
+                    //mViewPager?.setCurrentItem(0,false)
+                    mSongViewer?.scrollToPosition(0)
+                }
 
             }
 
@@ -179,15 +212,19 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             if (intent?.hasExtra(Constants.UPDATE_UI)!!) {
                 try {
                     var newPos = mApp?.mService?.mSongPos
-                    var currentPos = mViewPager?.currentItem
-                    if(currentPos != newPos){
-                        if(newPos!! > 0 && Math.abs(newPos-currentPos!!) <=5){
-                            /*scrollViewPager(newPosition, true, 1, false)*/
-                        }else{
-                            mViewPager?.setCurrentItem(newPos, false)
+                  //  var currentPos = mViewPager?.currentItem
+                    var currentPos = mSongViewer?.currentItem
+                    if (currentPos != newPos) {
+                        if (newPos!! > 0 && Math.abs(newPos - currentPos!!) <= 5) {
+                            //  scrollViewPager(newPos, true, 1, false)
+                           // mViewPager?.setCurrentItem(newPos, true)
+                            mSongViewer?.scrollToPosition(newPos)
+                        } else {
+                           // mViewPager?.setCurrentItem(newPos, false)
+                            mSongViewer?.scrollToPosition(newPos)
                         }
 
-                        mSeekBar.max  = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
+                        mSeekBar.max = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
                         mSeekBar.progress = 0
 
 
@@ -198,15 +235,17 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                     mHandler?.post(seekBarUpdateRunnable)
                     img_play_pause.setImageResource(R.drawable.pause)
                 } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
-            }else if(intent.hasExtra(Constants.ACTION_PLAY_PAUSE)){
-                if(mApp?.isServiceRunning()!!){
-                    if(mApp?.mService?.isMusicPlaying()!!){
+            } else if (intent.hasExtra(Constants.ACTION_PLAY_PAUSE)) {
+                if (mApp?.isServiceRunning()!!) {
+                    if (mApp?.mService?.isMusicPlaying()!!) {
                         img_play_pause.setImageResource(R.drawable.pause)
-                        mHandler?.removeCallbacks(seekBarUpdateRunnable)
-                    }else{
-                        img_play_pause.setImageResource(R.drawable.play)
                         mHandler?.post(seekBarUpdateRunnable)
+                        // mHandler?.removeCallbacks(seekBarUpdateRunnable)
+                    } else {
+                        img_play_pause.setImageResource(R.drawable.play)
+                        mHandler?.removeCallbacks(seekBarUpdateRunnable)
                     }
                 }
             }
@@ -242,7 +281,9 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         } else {
             img_play_pause.setImageResource(R.drawable.play)
         }
+    }
 
+    fun smoothScrollSeekbar(progress:Int){
 
     }
 
@@ -268,7 +309,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                 if (mApp?.mService?.mMediaPlayerPrepared!!) {
                     val currentDuration = mApp?.mService?.mMediaPlayer1?.duration
                     mSeekBar.max = currentDuration?.div(1000) as Int
-                    if(fromUser)
+                    if (fromUser)
                         mSeekBar.progress
                 }
             } catch (ex: Exception) {
@@ -281,6 +322,9 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            val seekBarPos = seekBar?.progress!!
+            if(mApp?.isServiceRunning()!!)
+                mApp?.mService?.mMediaPlayer1?.seekTo(seekBarPos.times(1000))
 
         }
 
@@ -367,12 +411,24 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     private fun initViewPager() {
         try {
             //  mViewPager?.visibility = View.INVISIBLE
-            mViewPagerAdapter = PlayerPagerAdapter(this, supportFragmentManager)
-            mViewPager?.apply {
-                adapter = mViewPagerAdapter
-                offscreenPageLimit = 0
-                addOnPageChangeListener(mPageChangeListener)
+            mRecyclerViewPagerAdapter = PlayerPagerAdapter(this)
+            mSongViewer?.apply {
+                adapter = mRecyclerViewPagerAdapter
+                setOffscreenItems(3);
+                setItemTransitionTimeMillis(35);
+                setItemTransformer(ScaleTransformer.Builder().setMinScale(0.8f).build())
+                addOnItemChangedListener(mPageChangeListener)
+              //  addOnPageChangeListener(mPageChangeListener)
+
             }
+           /* mViewPager?.apply {
+                adapter = mRecyclerViewPagerAdapter
+              //  clipChildren=false
+                offscreenPageLimit = 0
+
+                addOnPageChangeListener(mPageChangeListener)
+                //setPageTransformer(false, CarouselEffectTransformer(this@MPlayerActivity))
+            }*/
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
             if (mApp?.isServiceRunning()!!)
                 mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
@@ -393,33 +449,27 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    val mPageChangeListener = object : ViewPager.OnPageChangeListener {
-        override fun onPageScrollStateChanged(scrollState: Int) {
-            if (scrollState == ViewPager.SCROLL_STATE_DRAGGING) isUserScroll = true
+
+
+    override fun onCurrentItemChanged(viewHolder: RecyclerView.ViewHolder?, pos: Int) {
+
+    }
+
+    val mPageChangeListener = object :DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder> {
+        override fun onCurrentItemChanged(p0: RecyclerView.ViewHolder?, pos: Int) {
+            mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 200)
         }
 
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size !== 1) {
-                if (positionOffset == 0.0f && position != mApp?.mService?.mSongPos) {
-                    if (isUserScroll) {
-                        mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(position) }, 200)
-                    }
-                }
-            }
-        }
 
-        override fun onPageSelected(position: Int) {
-
-        }
 
 
     }
 
 
-    fun toolbarClick(view: View) {
-        when (view.id) {
-            /*  R.id.btn_back ->  { val intent= Intent(this, MainActivity::class.java)
-                  startActivity(intent)}*/
+    /* fun toolbarClick(view: View) {
+         when (view.id) {
+             *//*  R.id.btn_back ->  { val intent= Intent(this, MainActivity::class.java)
+                  startActivity(intent)}*//*
         }
     }
 
@@ -428,7 +478,32 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         animate.setDuration(500);
         animate.setFillAfter(true);
         view.startAnimation(animate);
-    }
+    }*/
+
+    /*   private fun scrollViewPager(
+           newPosition: Int,
+           smoothScroll: Boolean,
+           velocity: Int,
+           dispatchToListener: Boolean
+       ) {
+
+           *//*Using Reflection and will be changed afterwards*//*
+        val arg = arrayOfNulls<Class<*>>(4)
+        arg[0]=Int::class.java
+        arg[1]=Boolean::class.java
+        arg[2]=Int::class.java
+        arg[3]=Boolean::class.java
+       // val field = ViewPager::class.memberFunctions.single{it.name=="scrollToItem"} as KFunction<Int, Boolean, Int, Boolean>
+        *//*val field=ViewPager::class.memberFunctions.find { it.name == "scrollToItem"}
+        field?.let {
+            it.isAccessible = true
+            it.get
+
+        }*//*
+
+        USER_SCROLL = dispatchToListener
+
+    }*/
 
 
 }
