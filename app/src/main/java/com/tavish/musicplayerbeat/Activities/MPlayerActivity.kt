@@ -25,19 +25,17 @@ import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
 import com.yarolegovich.discretescrollview.DiscreteScrollView
+import com.yarolegovich.discretescrollview.InfiniteScrollAdapter
 import com.yarolegovich.discretescrollview.transform.ScaleTransformer
 import kotlinx.android.synthetic.main.activity_mplayer.*
 import kotlinx.coroutines.*
 import java.lang.Runnable
 
 
-class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder>, View.OnClickListener {
+class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
 
-
-
-
-
+    private var wrapper: InfiniteScrollAdapter<*>? = null
     // private val cardView_hidden by binder<CardView>(R.id.cv_mplayer_hidden)
     private val cardView_main by binder<CardView>(R.id.cv_mplayer_main)
     private val btn_next by binder<ImageButton>(R.id.btn_next)
@@ -84,7 +82,8 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
 
     private var mContext: Context? = null
     private var isUserScroll = true
-    private var USER_SCROLL: Boolean? = true
+    private var USER_SCROLL: Boolean? = false
+    private var CURRENT_POS:Int? = -1
 
     private var jobStart: Job? = null
 
@@ -179,9 +178,11 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
 
             R.id.btn_next -> {
                 var newPos = mSongViewer?.currentItem?.plus(1)
+             //   var newPos = wrapper?.getRealPosition(mSongViewer?.currentItem?.plus(1)!!)
                 if (newPos!! < mRecyclerViewPagerAdapter?.itemCount!!) {
                   //  mViewPager?.setCurrentItem(newPos, true)
-                    mSongViewer?.scrollToPosition(newPos)
+                    mSongViewer?.smoothScrollToPosition(newPos)
+
                 }else{
                     Toast.makeText(mContext, "No Songs to Skip.", Toast.LENGTH_SHORT).show()
                 }
@@ -192,12 +193,13 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
                // var newPos = mViewPager?.currentItem?.minus(1)
                 var newPos = mSongViewer?.currentItem?.minus(1)
                 if (newPos!! > -1) {
-                 //   mViewPager?.setCurrentItem(newPos, true)
-                    mSongViewer?.scrollToPosition(newPos)
+                    mSongViewer?.smoothScrollToPosition(newPos)
+
+                 //   mSongViewer?.addScrollStateChangeListener(mPageChangeListener)
                 }else{
                     // doubt in this line
                     //mViewPager?.setCurrentItem(0,false)
-                    mSongViewer?.scrollToPosition(0)
+                    mSongViewer?.smoothScrollToPosition(0)
                 }
 
             }
@@ -218,10 +220,10 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
                         if (newPos!! > 0 && Math.abs(newPos - currentPos!!) <= 5) {
                             //  scrollViewPager(newPos, true, 1, false)
                            // mViewPager?.setCurrentItem(newPos, true)
-                            mSongViewer?.scrollToPosition(newPos)
+                            mSongViewer?.smoothScrollToPosition(newPos)
                         } else {
                            // mViewPager?.setCurrentItem(newPos, false)
-                            mSongViewer?.scrollToPosition(newPos)
+                            mSongViewer?.smoothScrollToPosition(newPos)
                         }
 
                         mSeekBar.max = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
@@ -283,9 +285,7 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
         }
     }
 
-    fun smoothScrollSeekbar(progress:Int){
 
-    }
 
 
     var seekBarUpdateRunnable: Runnable = object : Runnable {
@@ -414,9 +414,10 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             mRecyclerViewPagerAdapter = PlayerPagerAdapter(this)
             mSongViewer?.apply {
                 adapter = mRecyclerViewPagerAdapter
-                setOffscreenItems(0);
-                setItemTransitionTimeMillis(35);
+                setOffscreenItems(3);
+                setItemTransitionTimeMillis(70);
                 setItemTransformer(ScaleTransformer.Builder().setMinScale(0.8f).build())
+              //  addScrollStateChangeListener(mPageChangeListener)
                 addOnItemChangedListener(mPageChangeListener)
               //  addOnPageChangeListener(mPageChangeListener)
 
@@ -431,8 +432,9 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             }*/
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
             if (mApp?.isServiceRunning()!!)
-               // mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
-                mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
+           //     mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
+              mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
+
             else {
                 val pos = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.CURRENT_SONG_POSITION, 0)
                 mSongViewer?.scrollToPosition(pos)
@@ -445,70 +447,55 @@ class MPlayerActivity : AppCompatActivity(),DiscreteScrollView.OnItemChangedList
             ex.printStackTrace()
         }
 
-        Handler().postDelayed({ mSongViewer?.setOffscreenItems(3) }, 1000)
+    //Handler().postDelayed({ mSongViewer?.setOffscreenItems(3) }, 500)
 
 
     }
 
 
 
-    override fun onCurrentItemChanged(viewHolder: RecyclerView.ViewHolder?, pos: Int) {
 
-    }
 
-    val mPageChangeListener = object :DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder> {
-        override fun onCurrentItemChanged(p0: RecyclerView.ViewHolder?, pos: Int) {
+   /* val mPageChangeListener = object :DiscreteScrollView.ScrollStateChangeListener<PlayerPagerAdapter.SongPickerViewHolder> {
+        override fun onScroll(
+            position: Float,
+            p1: Int,
+            p2: Int,
+            p3: PlayerPagerAdapter.SongPickerViewHolder?,
+            p4: PlayerPagerAdapter.SongPickerViewHolder?
+        ) {
+            if(position==1.0f|| position==-1.0f||position==0.0f)
+                USER_SCROLL=true
+        }
+
+        override fun onScrollEnd(p0: PlayerPagerAdapter.SongPickerViewHolder, pos: Int) {
             if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size != 1) {
                 if (pos != mApp?.mService?.mSongPos) {
-                        mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 200)
+                    if(USER_SCROLL!!)
+                    mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 500)
+
                 }
             }
         }
 
-
-
-
-    }
-
-
-    /* fun toolbarClick(view: View) {
-         when (view.id) {
-             *//*  R.id.btn_back ->  { val intent= Intent(this, MainActivity::class.java)
-                  startActivity(intent)}*//*
+        override fun onScrollStart(p0: PlayerPagerAdapter.SongPickerViewHolder, pos: Int) {
         }
-    }
-
-    fun slideUp(view: View) {
-        var animate = TranslateAnimation(0f, 0f, (view.height).toFloat(), 0f);
-        animate.setDuration(500);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
     }*/
 
-    /*   private fun scrollViewPager(
-           newPosition: Int,
-           smoothScroll: Boolean,
-           velocity: Int,
-           dispatchToListener: Boolean
-       ) {
+   val mPageChangeListener=object:DiscreteScrollView.OnItemChangedListener<PlayerPagerAdapter.SongPickerViewHolder>{
+       override fun onCurrentItemChanged(p0: PlayerPagerAdapter.SongPickerViewHolder?, pos: Int) {
 
-           *//*Using Reflection and will be changed afterwards*//*
-        val arg = arrayOfNulls<Class<*>>(4)
-        arg[0]=Int::class.java
-        arg[1]=Boolean::class.java
-        arg[2]=Int::class.java
-        arg[3]=Boolean::class.java
-       // val field = ViewPager::class.memberFunctions.single{it.name=="scrollToItem"} as KFunction<Int, Boolean, Int, Boolean>
-        *//*val field=ViewPager::class.memberFunctions.find { it.name == "scrollToItem"}
-        field?.let {
-            it.isAccessible = true
-            it.get
+           if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size != 1) {
+               if (pos != mApp?.mService?.mSongPos) {
+                  mApp?.mService?.setSelectedSong(pos)
+                 // mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 500)
+               }
+           }
+       }
 
-        }*//*
+   }
 
-        USER_SCROLL = dispatchToListener
 
-    }*/
 
 
 }
