@@ -74,7 +74,7 @@ class ArtistAdapter(artistFragment: ArtistFragment): RecyclerView.Adapter<Artist
             itemView.grid_Img_Album.layoutParams = params
 
             Picasso.get()
-                .load(MusicUtils.getAlbumArtUri(artistList?.get(position)?._artistId!!).toString())
+                .load(MusicUtils.getAlbumArtUri(artistList?.get( position)?._artistId!!).toString())
                 .fit()
                 .centerCrop()
                 .placeholder(R.mipmap.icn_beatdrop)

@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.3"
                 android:background="?selectableItemBackground"
-                android:src="@mipmap/btn_shuffle"
+                android:src="@drawable/btn_shuffle_on"
         />
         <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btn_equalizer"

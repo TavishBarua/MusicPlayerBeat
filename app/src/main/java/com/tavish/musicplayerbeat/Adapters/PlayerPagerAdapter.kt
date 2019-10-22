@@ -1,6 +1,7 @@
 package com.tavish.musicplayerbeat.Adapters
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.squareup.picasso.Picasso
@@ -29,7 +31,6 @@ class PlayerPagerAdapter(playerActivity: MPlayerActivity):RecyclerView.Adapter<P
 
 
    private val mNowPlayingActivity: MPlayerActivity = playerActivity
-    private var mContext: Context? = null
   //  private var mApp: Common? = Common.getInstance() as Common //activity?.applicationContext!! as Common
     private var mApp: Common? = Common.getInstance() as Common
     private var mSongDataHelper: SongDataHelper? = null
@@ -60,7 +61,8 @@ class PlayerPagerAdapter(playerActivity: MPlayerActivity):RecyclerView.Adapter<P
             .placeholder(R.drawable.ic_song_placeholder)
             .into(holder.image)
 
-        holder.txt_song_name.apply {
+
+       /* holder.txt_song_name.apply {
 
             text = mSongDataHelper?.mTitle
             isSelected = true
@@ -71,15 +73,15 @@ class PlayerPagerAdapter(playerActivity: MPlayerActivity):RecyclerView.Adapter<P
             text = mSongDataHelper?.mAlbum + " - " + mSongDataHelper?.mArtist
 
             isSelected = true
-        }
+        }*/
     }
 
 
     inner class SongPickerViewHolder(itemView: View?): RecyclerView.ViewHolder(itemView!!){
 
          val image:AppCompatImageView = itemView?.findViewById(R.id.img_cover_art)!!
-         val txt_song_name:AppCompatTextView = itemView?.findViewById(R.id.txt_song_name)!!
-         val txt_song_album:AppCompatTextView = itemView?.findViewById(R.id.txt_song_album)!!
+       /*  val txt_song_name:AppCompatTextView = itemView?.findViewById(R.id.txt_song_name)!!
+         val txt_song_album:AppCompatTextView = itemView?.findViewById(R.id.txt_song_album)!!*/
 
 
     }

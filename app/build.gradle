@@ -76,5 +76,6 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.71'
 
     implementation 'com.yarolegovich:discrete-scrollview:1.4.9'
+    implementation 'com.ramotion.navigationtoolbar:navigation-toolbar:0.1.3'
 
 }

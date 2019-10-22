@@ -40,8 +40,8 @@ class PlayerPagerFragment : Fragment() {
         mContext = activity?.applicationContext
         mPosition = arguments?.getInt("POSITION")!!
 
-        tSongName = view?.findViewById(R.id.txt_song_name)
-        tSongAlbum = view?.findViewById(R.id.txt_song_album)
+      /*  tSongName = view?.findViewById(R.id.txt_song_name)*/
+      /*tSongAlbum = view?.findViewById(R.id.txt_song_album)*/
         iSongImage = view?.findViewById(R.id.img_cover_art)
 
         mApp = activity?.applicationContext!! as Common
@@ -55,7 +55,7 @@ class PlayerPagerFragment : Fragment() {
             .placeholder(R.drawable.ic_song_placeholder)
             .into(iSongImage)
 
-        tSongName?.apply {
+      /*  tSongName?.apply {
 
             text = mSongDataHelper?.mTitle
             isSelected = true
@@ -66,7 +66,7 @@ class PlayerPagerFragment : Fragment() {
             text = mSongDataHelper?.mAlbum + " - " + mSongDataHelper?.mArtist
 
             isSelected = true
-        }
+        }*/
         return view
     }
 

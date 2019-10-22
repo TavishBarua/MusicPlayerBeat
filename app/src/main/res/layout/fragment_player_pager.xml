@@ -17,7 +17,7 @@
             android:scaleType="fitXY"
     />
 
-    <RelativeLayout android:layout_width="match_parent"
+ <!--   <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
             >
@@ -46,7 +46,7 @@
 
 
 
-    </RelativeLayout>
+    </RelativeLayout>-->
 
 
 </androidx.cardview.widget.CardView>

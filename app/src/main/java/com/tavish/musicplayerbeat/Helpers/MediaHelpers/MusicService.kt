@@ -29,15 +29,20 @@ import kotlinx.coroutines.*
 import java.lang.NumberFormatException
 import java.lang.Runnable
 import java.lang.ref.WeakReference
+import java.util.*
 import kotlin.Exception
+import kotlin.random.Random
+import kotlin.reflect.jvm.internal.impl.utils.CollectionsKt
 
 class MusicService : Service() {
 
     private var mContext: Context? = null
     private var mService: Service? = null
-    private var mSong: SongDto? = null
+    var mSong: SongDto? = null
 
     var mSongList: MutableList<SongDto>? = null
+
+
 
     /**
      * First time playing flag
@@ -52,7 +57,7 @@ class MusicService : Service() {
 
 
     lateinit var mSongs: MutableList<SongDto>
-    lateinit var mShuffledSongs: MutableList<SongDto>
+    lateinit var mShuffledSongs: MutableList<Int>
     lateinit var mOriginalSongs: MutableList<SongDto>
 
     var mSongDataHelper: SongDataHelper? = null
@@ -119,6 +124,25 @@ class MusicService : Service() {
         mMediaIntent!!.action = Constants.MEDIA_INTENT
         mApp!!.mService = this
 
+        /*if (SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.SHUFFLE_MODE, Constants.SHUFFLE_OFF) == Constants.SHUFFLE_ON) {
+            setShuffledOne()
+        }*/
+
+        for (song in mSongs) {
+            try {
+                mOriginalSongs.add(song.clone() as SongDto)
+                mShuffledSongs.add(song._trackNumber!!)
+            } catch (e: CloneNotSupportedException) {
+                e.printStackTrace()
+                Logger.log(e.message!!)
+            }
+
+        }
+
+       /* if (SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.REPEAT_MODE, Constants.REPEAT_OFF) == Constants.SHUFFLE_ON) {
+            setShuffledOne()
+        }
+*/
         mMediaSession = MediaSessionCompat(
             applicationContext, "AudioPlayer", ComponentName(
                 this,
@@ -190,16 +214,18 @@ class MusicService : Service() {
     private val mOnCompletionListener = MediaPlayer.OnCompletionListener {
 
         val repeat_pref = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.REPEAT_MODE, Constants.REPEAT_OFF)
-        if (repeat_pref == Constants.REPEAT_OFF || repeat_pref == Constants.REPEAT_PLAYLIST) {
+        if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.REPEAT_MODE,Constants.REPEAT_OFF)==Constants.SHUFFLE_ON){
+
+            mSongPos= (0..mOriginalSongs.size).random()
+        }
+        if (repeat_pref == Constants.REPEAT_OFF || repeat_pref == Constants.REPEAT_PLAYLIST || repeat_pref == Constants.SHUFFLE_ON) {
             if (mSongPos < (mSongs.size - 1)) {
                 mSongPos++
                 startSong()
             } else {
                 mSongPos = 0
-                startSong()
-                if (repeat_pref == Constants.REPEAT_PLAYLIST) {
-                    stopSelf()
-                }
+                if (repeat_pref == Constants.REPEAT_OFF) stopSelf()
+                else if (repeat_pref == Constants.REPEAT_PLAYLIST) startSong()
             }
         } else if (repeat_pref == Constants.REPEAT_SONG) {
             startSong()
@@ -229,7 +255,7 @@ class MusicService : Service() {
     val sendUpdatesToUI = object : Runnable {
         override fun run() {
             sendIntentDataMedia()
-            mHandler?.postDelayed(this, 500)
+            mHandler?.postDelayed(this, 200)
         }
 
     }
@@ -243,11 +269,6 @@ class MusicService : Service() {
                  .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, mMediaPlayer1?.currentPosition!!)
              SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SONG_TOTAL_SEEK_DURATION, mMediaPlayer1?.duration!!)
          }
-
-
-
-
-
     }
 
 
@@ -297,13 +318,13 @@ class MusicService : Service() {
 
     fun setSongList(listSong: MutableList<SongDto>) {
         mSongs.clear()
-        mShuffledSongs.clear()
+       // mShuffledSongs.clear()
         mOriginalSongs.clear()
 
         mSongs.addAll(listSong)
         for (song in listSong) {
             try {
-                mShuffledSongs.add(song.clone() as SongDto)
+             //   mShuffledSongs.add(song.clone() as SongDto)
                 mOriginalSongs.add(song.clone() as SongDto)
             } catch (ex: Exception) {
                 Logger.log(ex.message!!)
@@ -318,6 +339,18 @@ class MusicService : Service() {
             startSong()
         }
     }
+
+    // properties??
+   /* fun setShuffledOne(){
+        Collections.shuffle(mShuffledSongs,java.util.Random(System.nanoTime()))
+      //  mSongs.addAll(mShuffledSongs)
+    }*/
+
+    fun setOriginalOne(){
+        mSongs.clear()
+        mSongs.addAll(mOriginalSongs)
+    }
+
 
     fun initMediaPlayers() {
         mMediaPlayer1 = MediaPlayer()

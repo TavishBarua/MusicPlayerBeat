@@ -22,6 +22,9 @@ class Constants{
      const val LARGE_TABLET = "large_tablet"
      const val XLARGE_TABLET = "xlarge_tablet"
 
+      //const val SHUFFLE_OFF = 0
+
+
         //Device orientation constants.
       const val ORIENTATION_PORTRAIT = 0
       const val ORIENTATION_LANDSCAPE = 1
@@ -62,7 +65,8 @@ class Constants{
         const val REPEAT_OFF = 0
         const val REPEAT_PLAYLIST = 1
         const val REPEAT_SONG = 2
-        const val A_B_REPEAT = 3
+        const val SHUFFLE_ON = 3
+        //const val A_B_REPEAT = 3
 
         const val JUST_UPDATE_UI = "JUST_UPDATE_UI"
 
