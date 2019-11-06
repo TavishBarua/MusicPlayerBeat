@@ -56,11 +56,19 @@
                 android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/btn_repeat"
+                android:id="@+id/btn_repeat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                app:srcCompat="@drawable/btn_repeat_off"/>
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_equalizer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
                     android:background="?selectableItemBackground"
-                    app:srcCompat="@mipmap/btn_repeat_none"/>
+                    app:srcCompat="@drawable/drawable_overflow"/>
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>

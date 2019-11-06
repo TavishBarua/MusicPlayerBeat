@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private val tabLayout by binder<TabLayout>(R.id.tabs)
-    private val viewPager by binder<ViewPager>(R.id.viewpager)
     private val appBarLayout by binder<AppBarLayout>(R.id.appBarLayout)
     private lateinit var context:WeakReference<Context>
     private lateinit var mAdapter: TabFragmentAdapter

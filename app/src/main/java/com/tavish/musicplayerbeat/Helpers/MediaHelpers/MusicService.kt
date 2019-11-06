@@ -16,8 +16,15 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
 import androidx.media.session.MediaButtonReceiver.handleIntent
+import com.h6ah4i.android.media.IBasicMediaPlayer
+import com.h6ah4i.android.media.IMediaPlayerFactory
+import com.h6ah4i.android.media.opensl.OpenSLMediaPlayer
+import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerContext
+import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerFactory
+import com.h6ah4i.android.media.standard.StandardMediaPlayerFactory
 import com.tavish.musicplayerbeat.BroadcastReceivers.HeadsetNotificationBroadcast
 import com.tavish.musicplayerbeat.Common
+import com.tavish.musicplayerbeat.Helpers.Equalizer.EqualizerDataHelper
 import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
@@ -72,9 +79,17 @@ class MusicService : Service() {
     var prepareServiceListener: PrepareServiceListener? = null
 
 
-    var mMediaPlayer1: MediaPlayer? = null
+   // var mMediaPlayer1: MediaPlayer? = null
 
     var mMediaSession: MediaSessionCompat? = null
+
+    var factory:IMediaPlayerFactory? = null
+    var mMediaPlayer1:IBasicMediaPlayer?=null
+    private var mEqualizerDataHelper: EqualizerDataHelper? = null
+    private var openSLMediaPlayerContext:OpenSLMediaPlayerContext?=null
+    private var openSLMediaPlayerContextParam:OpenSLMediaPlayerContext.Parameters?=null
+
+
 
     // var songDataHelper: SongDataHelper? = null
 
@@ -82,13 +97,18 @@ class MusicService : Service() {
     var mMediaPlayerPrepared = false
 
 
-    var onErrorListener = MediaPlayer.OnErrorListener { mp, what, extra -> true }
+    var onErrorListener = IBasicMediaPlayer.OnErrorListener { mp, what, extra -> true }
 
 
     override fun onCreate() {
         super.onCreate()
         mContext = this
         mService = this
+
+        //factory = StandardMediaPlayerFactory(this)
+        factory = OpenSLMediaPlayerFactory(applicationContext)
+        mMediaPlayer1 = factory!!.createMediaPlayer()
+
 
         mApp = applicationContext as Common
         mApp?.setIsServiceRunning(true)
@@ -113,6 +133,7 @@ class MusicService : Service() {
         mShuffledSongs = mutableListOf()
 
         initMediaPlayers()
+        initCustomAudioFX()
 
         mAudioManager = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mAudioManagerHelper = AudioManagerHelper()
@@ -211,7 +232,7 @@ class MusicService : Service() {
         }
     }
 
-    private val mOnCompletionListener = MediaPlayer.OnCompletionListener {
+    private val mOnCompletionListener = IBasicMediaPlayer.OnCompletionListener {
 
         val repeat_pref = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.REPEAT_MODE, Constants.REPEAT_OFF)
         if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.REPEAT_MODE,Constants.REPEAT_OFF)==Constants.SHUFFLE_ON){
@@ -234,8 +255,8 @@ class MusicService : Service() {
 
 
     private val onPreparedListener =
-        MediaPlayer.OnPreparedListener {
-            mMediaPlayerPrepared = true;
+        IBasicMediaPlayer.OnPreparedListener {
+            mMediaPlayerPrepared = true
             mMediaPlayer1?.setOnCompletionListener(mOnCompletionListener)
             // mMediaPlayer1?.seekTo(PreferencesHelper.getInstance().getInt(PreferencesHelper.Key.SONG_CURRENT_SEEK_DURATION))
 
@@ -351,11 +372,10 @@ class MusicService : Service() {
         mSongs.addAll(mOriginalSongs)
     }
 
-
     fun initMediaPlayers() {
-        mMediaPlayer1 = MediaPlayer()
+      //  mMediaPlayer1 = MediaPlayer()
         mMediaPlayer1?.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
-        mMediaPlayer1?.setAudioAttributes(AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+        mMediaPlayer1?.setAudioAttributes(com.h6ah4i.android.media.compat.AudioAttributes.Builder().setContentType(com.h6ah4i.android.media.compat.AudioAttributes.CONTENT_TYPE_MUSIC).build())
 
         if (mSongs.size > 0) {
             startSong()
@@ -365,7 +385,7 @@ class MusicService : Service() {
 
     fun startSong() {
         mHandler?.removeCallbacks(sendUpdatesToUI)
-        mMediaPlayerPrepared = false
+
         mSong = mSongs[mSongPos]
         mMediaPlayer1?.reset()
         try {
@@ -374,11 +394,14 @@ class MusicService : Service() {
             mSongDataHelper?.populateSongData(mContext!!, null, mSongPos)
             //   mApp?.getDBAccessHelper()?.insertSongCount(mSongs.get(mSongPos))
             // mApp?.getDBAccessHelper()?.addToRecentlyPlayed(mSongs.get(mSongPos))
-
+            mMediaPlayerPrepared = false
             mMediaPlayer1?.setDataSource(mContext!!, getUri(mSongs[mSongPos]._id!!))
+           // mMediaPlayer1?.setOnPreparedListener(onPreparedListener)
             mMediaPlayer1?.setOnPreparedListener(onPreparedListener)
             mMediaPlayer1?.setOnErrorListener(onErrorListener)
-            mMediaPlayer1?.prepareAsync()
+            //mMediaPlayer1?.prepareAsync()
+               mMediaPlayer1?.prepare()
+
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -531,6 +554,41 @@ class MusicService : Service() {
         }
     }
 
+    fun initCustomAudioFX(){
+        try {
+            openSLMediaPlayerContextParam = OpenSLMediaPlayerContext.Parameters()
+           // openSLMediaPlayerContextParam?.options = OpenSLMediaPlayerContext.OPTION_USE_BASSBOOST
+          //  openSLMediaPlayerContextParam?.options = OpenSLMediaPlayerContext.OPTION_USE_HQ_EQUALIZER
+            openSLMediaPlayerContext= OpenSLMediaPlayerContext(mContext, openSLMediaPlayerContextParam)
+            mEqualizerDataHelper = EqualizerDataHelper(
+                factory,
+                mMediaPlayer1!!.audioSessionId,
+                SharedPrefHelper.getInstance().getBoolean(
+                    SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE,
+                    false
+                ),openSLMediaPlayerContext!!
+            )
+        }catch (e:UnsupportedOperationException) {
+            e.printStackTrace();
+        } catch (e:Exception) {
+            e.printStackTrace();
+        }
+    }
+
+    fun getEqualizerHelper(): EqualizerDataHelper? {
+        return mEqualizerDataHelper
+    }
+
+  /*  fun applyMediaPlayerHQ(){
+        if (mEqualizerDataHelper==null)
+            return
+        try {
+
+        }catch (ex:Exception){}
+    }*/
+
+
+
     override fun onDestroy() {
         super.onDestroy()
         mApp?.setIsServiceRunning(false)
@@ -624,6 +682,7 @@ class MusicService : Service() {
     interface PrepareServiceListener {
         fun onServiceRunning(musicService: MusicService)
     }
+
 
 
 }

@@ -44,6 +44,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     private val img_play_pause by binder<ImageView>(R.id.img_play_pause)
     private val rr_play_pause by binder<RelativeLayout>(R.id.ll_play_pause)
     private val btn_repeat by binder<ImageButton>(R.id.btn_repeat)
+    private val btn_equalizer by binder<ImageButton>(R.id.btn_equalizer)
     private val toolbar by binder<Toolbar>(R.id.toolbar)
     private lateinit var tv_tb_song_title: AppCompatTextView
 
@@ -95,11 +96,6 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     private var jobStart: Job? = null
 
 
-    companion object {
-        val mediaPlayer: MediaPlayer = MediaPlayer()
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mplayer)
@@ -143,6 +139,8 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         btn_next.setOnClickListener(this)
         btn_prev.setOnClickListener(this)
         btn_repeat.setOnClickListener(this)
+        btn_equalizer.setOnClickListener(this)
+
     }
 
 
@@ -170,7 +168,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     animatePlayToPause()
-                    mHandler?.postDelayed(seekBarUpdateRunnable, 1500)
+                    mHandler?.postDelayed(seekBarUpdateRunnable, 500)
                 }
 
                 /* @SuppressLint("StaticFieldLeak")
@@ -239,6 +237,12 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                     )
                 }
                 repeatButton()
+            }
+
+            R.id.btn_equalizer->{
+                val intent= Intent(this, EqualizerActivity::class.java)
+                startActivity(intent)
+
             }
 
             /*  R.id.btn_shuffle ->{

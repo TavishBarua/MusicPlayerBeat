@@ -29,9 +29,6 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
     private var mApp: Common? = mContext.applicationContext as? Common
 
 
-    companion object {
-        val mediaPlayer: MediaPlayer = MediaPlayer()
-    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
