@@ -1,42 +1,47 @@
 package com.tavish.musicplayerbeat.Activities
 
-import android.app.backup.SharedPreferencesBackupHelper
+import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
+import android.media.audiofx.PresetReverb
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.Menu
-import android.widget.CompoundButton
-import android.widget.SeekBar
-import android.widget.Spinner
-import android.widget.Switch
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.*
-import androidx.core.view.MenuItemCompat
+import androidx.appcompat.widget.Toolbar
 import com.tavish.musicplayerbeat.Common
+import com.tavish.musicplayerbeat.DB.DBHelper
 import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Helpers.binder
 import com.tavish.musicplayerbeat.R
+import kotlinx.android.synthetic.main.activity_equalizer.*
+import kotlinx.coroutines.*
 
-class EqualizerActivity : AppCompatActivity() {
-
-
+class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
+
+
         private val NUM_BAND_VIEWS = 10
         private val SEEKBAR_MAX = 1000
     }
 
-    private var bassBoosterLevel: Int? = null
-    private var virtualizerLevel: Int? = null
-    private var preAmpLevel: Int? = null
+    private var bassBoosterLevel: Short? = null
 
+    private var virtualizerLevel: Short? = null
+    private var preAmpLevel: Float? = null
     private var mSpinnerPreset: Spinner? = null
+
     private var mSeekBarBassBoost: AppCompatSeekBar? = null
     private var mSeekBarVirtualizer: AppCompatSeekBar? = null
- //   private var mSeekBarPresetReverb: AppCompatSeekBar? = null
+    //   private var mSeekBarPresetReverb: AppCompatSeekBar? = null
     private var btn_toggleEQ: SwitchCompat? = null
-
-
     private var thirtyOneHzLevel = 16
+
+
     private var sixtyTwoHzLevel = 16
     private var oneHunderedTwentyFiveHzLevel = 16
     private var twoHundredFiftyHzLevel = 16
@@ -46,15 +51,16 @@ class EqualizerActivity : AppCompatActivity() {
     private var fourKHzLevel = 16
     private var eightKHzLevel = 16
     private var sixteenKHzLevel = 16
+    private var reverbSetting: Short = 0
 
     private var mToolbar: Toolbar? = null
+
     private var mContext: Context? = null
     private var mApp: Common? = null
-
-
     /*   private var mTextViewBandLevels: Array<AppCompatTextView>? = null
        private var mSeekBarBandLevels: Array<AppCompatSeekBar>? = null*/
     private var mSeekBarPreAmpLevel: SeekBar? = null
+
 
     private val mThirtyOneHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_0)
     private val mSixtyTwoHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_1)
@@ -66,6 +72,7 @@ class EqualizerActivity : AppCompatActivity() {
     private val mFourKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_7)
     private val mEightKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_8)
     private val mSixteenKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_9)
+    private val mLoadPresetBtn by binder<AppCompatButton>(R.id.btn_load_preset)
 
 
     private var mSeekBarListener: SeekBar.OnSeekBarChangeListener? = null
@@ -87,6 +94,25 @@ class EqualizerActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setTitle("EQUALIZER")
         supportActionBar?.setDisplayShowTitleEnabled(true)
+
+        val reverbPresets: MutableList<String> = mutableListOf()
+        reverbPresets.add("None")
+        reverbPresets.add("Large Hall")
+        reverbPresets.add("Large Room")
+        reverbPresets.add("Medium Hall")
+        reverbPresets.add("Medium Room")
+        reverbPresets.add("Small Room")
+        reverbPresets.add("Plate")
+
+        val dataAdapter = ArrayAdapter<String>(this, R.layout.simple_spinner_item, reverbPresets)
+        dataAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
+        spinner_equalizer_preset.adapter = dataAdapter
+        spinner_equalizer_preset.onItemSelectedListener = reverbListener
+
+        mLoadPresetBtn.setOnClickListener(this)
+
+
+
         mToolbar?.setNavigationOnClickListener { v -> onBackPressed() }
         obtainPalleteView()
         mSeekBarListener = object : SeekBar.OnSeekBarChangeListener {
@@ -265,7 +291,7 @@ class EqualizerActivity : AppCompatActivity() {
                     }
 
                     R.id.seekbar_bassbooster -> {
-                        bassBoosterLevel = seekBarProg
+                        bassBoosterLevel = seekBarProg.toShort()
                         if (mApp?.isServiceRunning()!!) {
                             mApp?.mService?.getEqualizerHelper()?.getBassBoost()
                                 ?.setStrength(bassBoosterLevel!!.toShort())
@@ -276,7 +302,7 @@ class EqualizerActivity : AppCompatActivity() {
                     }
 
                     R.id.seekbar_virtualizer -> {
-                        virtualizerLevel = seekBarProg
+                        virtualizerLevel = seekBarProg.toShort()
                         if (mApp?.isServiceRunning()!!) {
                             mApp?.mService?.getEqualizerHelper()?.getVirtualizer()
                                 ?.setStrength(virtualizerLevel!!.toShort())
@@ -287,20 +313,13 @@ class EqualizerActivity : AppCompatActivity() {
                     }
 
                     R.id.seekbar_preamp -> {
-                        preAmpLevel = seekBarProg
+                        preAmpLevel = seekBarProg.toFloat()
                         if (mApp?.isServiceRunning()!!) {
-                           // mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level= preAmpLevel!!.toFloat()
-                            if (seekBarProg == 3) {
-                                mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level= 0.0F
-                            } else if (seekBarProg != 3) {
-                                if (seekBarProg == 0) {
-                                    mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level= -3.0F
-                                } else
-// to be changed: DANGER
-                                    mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level=  2.5F
-                            }
+                            // mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level= preAmpLevel!!.toFloat()
+                            mApp?.mService?.getEqualizerHelper()?.getPreAmp()?.level =
+                                seekBarProg.plus(1).toFloat().times(0.1f)
                         }
-                        if ((seekBarProg == 0 || seekBarProg == 6) && fromUser) {
+                        if ((seekBarProg == 0 || seekBarProg == 3) && fromUser) {
                             seekBar.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                         }
 
@@ -339,57 +358,135 @@ class EqualizerActivity : AppCompatActivity() {
 
     }
 
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toggle_switch_menu, menu)
         val menuItem = menu?.findItem(R.id.myswitch)
         val view = menuItem?.actionView
         btn_toggleEQ = view?.findViewById(R.id.switchButton)
         btn_toggleEQ?.apply {
-            //  isChecked = SharedPrefHelper.getInstance().getBoolean(SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE, false)
+            isChecked = SharedPrefHelper.getInstance().getBoolean(SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE, false)
             setOnCheckedChangeListener(eqEnableState);
 
         }
         return true
     }
 
-    fun obtainPalleteView() {
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btn_load_preset -> {
+                loadPresetDialog().show()
 
-        mSpinnerPreset = findViewById(R.id.spinner_equalizerb_preset)
-
-
-        /*mTextViewBandLevels?.apply {
-            get(0).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_0)  //31 Hz
-            get(1).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_1)  //62 Hz
-            get(2).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_2)  //125 Hz
-            get(3).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_3)  //250 Hz
-            get(4).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_4)  //500 Hz
-            get(5).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_5)  //1 KHz
-            get(6).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_6)  //2 KHz
-            get(7).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_7)  //4 KHz
-            get(8).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_8)  //8 KHz
-            get(9).findViewById<AppCompatTextView>(R.id.textview_equalizer_band_9)  //16 KHz
+            }
         }
-*/
-        /* mSeekBarBandLevels?.apply {
-             get(0).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_0)  //31 Hz
-             get(1).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_1)  //62 Hz
-             get(2).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_2)  //125 Hz
-             get(3).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_3)  //250 Hz
-             get(4).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_4)  //500 Hz
-             get(5).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_5)  //1 KHz
-             get(6).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_6)  //2 KHz
-             get(7).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_7)  //4 KHz
-             get(8).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_8)  //8 KHz
-             get(9).findViewById<AppCompatSeekBar>(R.id.seekbar_equalizer_band_9)  //16 KHz
-         }*/
+    }
+
+    fun loadPresetDialog(): AlertDialog {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val cursor = mApp?.getDBAccessHelper()?.getEQPresets()
+        dialogBuilder.setTitle("Preset")
+        dialogBuilder.setCursor(cursor,object:DialogInterface.OnClickListener{
+            override fun onClick(dialog: DialogInterface?, which: Int) {
+                cursor?.moveToPosition(which)
+                dialog?.dismiss()
+                thirtyOneHzLevel = cursor?.getInt(cursor.getColumnIndex(DBHelper.EQ_31_Hz))!!
+                sixtyTwoHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_62_Hz))
+                oneHunderedTwentyFiveHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_125_Hz))
+                twoHundredFiftyHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_250_Hz))
+                fiveHundredHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_500_Hz))
+                oneKHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_1_KHz))
+                twoKHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_2_KHz))
+                fourKHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_4_KHz))
+                eightKHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_8_KHz))
+                sixteenKHzLevel = cursor.getInt(cursor.getColumnIndex(DBHelper.EQ_16_KHz))
+                virtualizerLevel = cursor.getShort(cursor.getColumnIndex(DBHelper.EQ_Virtualizer))
+                bassBoosterLevel = cursor.getShort(cursor.getColumnIndex(DBHelper.EQ_BassBoost))
+                reverbSetting = cursor.getShort(cursor.getColumnIndex(DBHelper.EQ_Reverb))
+                preAmpLevel = cursor.getFloat(cursor.getColumnIndex(DBHelper.EQ_PreAmp))
+
+                /*Save EQ settings into DB*/
+                GlobalScope.launch(Dispatchers.Main){
+                    setEQValues()
+                    seekBarSlidersTask()
+                }
+
+            }
+        }, DBHelper.PRESET_NAME)
+
+        return dialogBuilder.create()
+
+    }
+
+    suspend fun setEQValues(){
+        val currentEQvalues = mApp?.getDBAccessHelper()?.getEQValues()!!
+        withContext(Dispatchers.IO){
+            if(currentEQvalues[14]==1){
+                mApp?.getDBAccessHelper()?.updateEQValues("UPDATE","Reserved",thirtyOneHzLevel,sixtyTwoHzLevel,oneHunderedTwentyFiveHzLevel,twoHundredFiftyHzLevel,
+                    fiveHundredHzLevel,oneKHzLevel,twoKHzLevel,fourKHzLevel,eightKHzLevel,sixteenKHzLevel,virtualizerLevel,bassBoosterLevel,
+                    reverbSetting,preAmpLevel)
+            }else{
+                mApp?.getDBAccessHelper()?.updateEQValues("ADD","Reserved",thirtyOneHzLevel,sixtyTwoHzLevel,oneHunderedTwentyFiveHzLevel,twoHundredFiftyHzLevel,
+                    fiveHundredHzLevel,oneKHzLevel,twoKHzLevel,fourKHzLevel,eightKHzLevel,sixteenKHzLevel,virtualizerLevel,bassBoosterLevel,
+                    reverbSetting,preAmpLevel)
+            }
+        }
+    }
+
+    suspend fun seekBarSlidersTask(){
+        lateinit var eqValues:Array<Int?>
+
+        withContext(Dispatchers.IO){
+            eqValues = mApp?.getDBAccessHelper()?.getEQValues()!!
+        }
+
+        thirtyOneHzLevel = eqValues[0]!!
+        sixtyTwoHzLevel = eqValues[1]!!
+        oneHunderedTwentyFiveHzLevel = eqValues[2]!!
+        twoHundredFiftyHzLevel = eqValues[3]!!
+        fiveHundredHzLevel = eqValues[4]!!
+        oneKHzLevel = eqValues[5]!!
+        twoKHzLevel = eqValues[6]!!
+        fourKHzLevel = eqValues[7]!!
+        eightKHzLevel = eqValues[8]!!
+        sixteenKHzLevel = eqValues[9]!!
+        virtualizerLevel = eqValues[10]?.toShort()!!
+        bassBoosterLevel = eqValues[11]?.toShort()!!
+        preAmpLevel = eqValues[12]?.toFloat()!!
+        reverbSetting = eqValues[13]?.toShort()!!
+
+
+        mThirtyOneHzSeekBar.progress = thirtyOneHzLevel
+        mSixtyTwoHzSeekBar.progress = sixtyTwoHzLevel
+        mOneHunderedTwentyFiveHzSeekBar.progress = oneHunderedTwentyFiveHzLevel
+        mTwoHundredFiftyHzSeekBar.progress = twoHundredFiftyHzLevel
+        mFiveHundredHzSeekBar.progress =  fiveHundredHzLevel
+        mOneKHzSeekBar.progress = oneKHzLevel
+        mTwoKHzSeekBar.progress = twoKHzLevel
+        mFourKHzSeekBar.progress = fourKHzLevel
+        mEightKHzSeekBar.progress = eightKHzLevel
+        mSixteenKHzSeekBar.progress = sixteenKHzLevel
+        mSeekBarVirtualizer?.progress = virtualizerLevel?.toInt()!!
+        mSeekBarBassBoost?.progress = bassBoosterLevel?.toInt()!!
+        mSeekBarPreAmpLevel?.progress = preAmpLevel?.toInt()!!
+        mSpinnerPreset?.setSelection(reverbSetting.toInt(),false)
+
+        /*To be Added
+        EQ Values code */
+
+
+
+
+    }
+
+    fun obtainPalleteView() {
+        mSpinnerPreset = findViewById(R.id.spinner_equalizer_preset)
         mSeekBarVirtualizer = findViewById(R.id.seekbar_virtualizer)
         mSeekBarBassBoost = findViewById(R.id.seekbar_bassbooster)
         mSeekBarPreAmpLevel = findViewById(R.id.seekbar_preamp)
     }
 
-    val eqEnableState = object : CompoundButton.OnCheckedChangeListener {
-        override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-
+    val eqEnableState =
+        CompoundButton.OnCheckedChangeListener { _, _ ->
             if (btn_toggleEQ?.isChecked!!) {
                 SharedPrefHelper.getInstance()
                     .put(SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE, true)
@@ -399,6 +496,7 @@ class EqualizerActivity : AppCompatActivity() {
                     mApp?.mService?.getEqualizerHelper()?.createHQVizualizer()
                     mApp?.mService?.getEqualizerHelper()?.createVirtualizer()
                     mApp?.mService?.getEqualizerHelper()?.createPreAmp()
+                    mApp?.mService?.getEqualizerHelper()?.createPresetReverb()
 
                     mApp?.mService?.getEqualizerHelper()?.apply {
                         getBassBoost()?.enabled = true
@@ -406,6 +504,7 @@ class EqualizerActivity : AppCompatActivity() {
                         getHQEqualizer()?.enabled = true
                         getHQVisualizer()?.enabled = true
                         getPreAmp()?.enabled = true
+                        getPresetReverb()?.enabled = true
                     }
                 }
             } else {
@@ -417,15 +516,75 @@ class EqualizerActivity : AppCompatActivity() {
                         getHQEqualizer()?.enabled = false
                         getHQVisualizer()?.enabled = false
                         getPreAmp()?.enabled = false
+                        getPresetReverb()?.enabled = false
                     }
                 }
+            }
+        }
+
+    val reverbListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            id: Long
+        ) {
+            SharedPrefHelper.getInstance().put(
+                SharedPrefHelper.Key.LAST_PRESET_NAME,
+                spinner_equalizer_preset.selectedItem.toString()
+            )
+            reverbSetting = position.toShort()
+
+            val presetValue = mApp?.mService?.getEqualizerHelper()?.getPresetReverb()
+
+            // may be switch to be implemented
+            if (mApp?.isServiceRunning()!!) {
+                if (position == 0) {
+                    presetValue?.preset = PresetReverb.PRESET_NONE
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 0
+                } else if (position == 1) {
+                    presetValue?.preset = PresetReverb.PRESET_LARGEHALL
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 1
+                } else if (position == 2) {
+                    presetValue?.preset = PresetReverb.PRESET_LARGEROOM
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 2
+                } else if (position == 3) {
+                    presetValue?.preset = PresetReverb.PRESET_MEDIUMHALL
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 3
+                } else if (position == 4) {
+                    presetValue?.preset = PresetReverb.PRESET_MEDIUMROOM
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 4
+                } else if (position == 5) {
+                    presetValue?.preset = PresetReverb.PRESET_SMALLROOM
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 5
+                } else if (position == 6) {
+                    presetValue?.preset = PresetReverb.PRESET_PLATE
+                    if (presetValue != null)
+                        mApp?.mService?.mMediaPlayer1?.attachAuxEffect(presetValue.id)
+                    reverbSetting = 6
+                } else
+                    reverbSetting = 0
 
             }
 
-
         }
-    }
 
+    }
 
     fun seekBarValueChanger(seekBarProg: Int?, hertzValue: Short?) {
         if (seekBarProg == 16) {

@@ -1,13 +1,15 @@
 package com.tavish.musicplayerbeat.Helpers.Equalizer
 
+import com.h6ah4i.android.media.IBasicMediaPlayer
 import com.h6ah4i.android.media.IMediaPlayerFactory
 import com.h6ah4i.android.media.IReleasable
 import com.h6ah4i.android.media.audiofx.*
 import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerContext
-import com.h6ah4i.android.media.opensl.audiofx.OpenSLBassBoost
+import com.h6ah4i.android.media.opensl.audiofx.OpenSLPresetReverb
+import com.h6ah4i.android.media.standard.audiofx.StandardPresetReverb
 
 
-class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equalizer:Boolean, openSLMediaPlayerContext: OpenSLMediaPlayerContext) : IReleasable {
+class EqualizerDataHelper(factory: IMediaPlayerFactory?, player:IBasicMediaPlayer, equalizer:Boolean, openSLMediaPlayerContext: OpenSLMediaPlayerContext) : IReleasable {
     private var mHQEqualizer: IEqualizer? = null
     private var mHQVisualizer: IHQVisualizer? = null
     private var mVirtualizer: IVirtualizer? = null
@@ -16,7 +18,7 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
     private var mEnvironmentalReverb: IEnvironmentalReverb? = null
     private var mPresetReverb: IPresetReverb? = null
     private var mPreAmp: IPreAmp? = null
-    private var mAudioSessionId: Int? = audioSessionId
+    private var mPlayer: IBasicMediaPlayer? = player
     private var mEqualizerStatus: Boolean? = equalizer
     private var mOpenSLMediaPlayerContext: OpenSLMediaPlayerContext? = openSLMediaPlayerContext
 
@@ -62,7 +64,7 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
      fun createBassBoost(): IBassBoost? {
         if (mBassBoost == null) {
             try {
-                mBassBoost = _mFactory?.createBassBoost(mAudioSessionId!!)
+                mBassBoost = _mFactory?.createBassBoost(mPlayer!!)
                 mBassBoost?.enabled=mEqualizerStatus!!
             } catch (e: UnsupportedOperationException) {
                 // the effect is not supported
@@ -80,7 +82,7 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
     fun createVirtualizer(): IVirtualizer? {
         if (mVirtualizer == null) {
             try {
-                mVirtualizer = _mFactory?.createVirtualizer(mAudioSessionId!!)
+                mVirtualizer = _mFactory?.createVirtualizer(mPlayer!!)
                 mVirtualizer?.enabled=mEqualizerStatus!!
             } catch (e: UnsupportedOperationException) {
                 // the effect is not supported
@@ -97,7 +99,7 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
     fun createPresetReverb(): IPresetReverb? {
         if (mPresetReverb == null) {
             try {
-                mPresetReverb = _mFactory?.createPresetReverb()
+                mPresetReverb = StandardPresetReverb(1,mPlayer?.audioSessionId!!)
             } catch (e: UnsupportedOperationException) {
                 // the effect is not supported
             } catch (e: IllegalArgumentException) {
@@ -142,12 +144,12 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
       //  releaseVirtualizer()
        // releaseEqualizer()
       //  releaseLoudnessEnhancer()
-      //  releasePresetReverb()
+        releasePresetReverb()
        // releaseEnvironmentalReverb()
         //releaseVisualizer()
         releaseHQVisualizer()
         releaseHQEqualizer()
-        //releasePreAmp()
+        releasePreAmp()
     }
 
     private fun safeRelease(obj: IReleasable?) {
@@ -178,6 +180,16 @@ class EqualizerDataHelper(factory: IMediaPlayerFactory?, audioSessionId:Int, equ
     private fun releaseHQEqualizer() {
         safeRelease(mHQEqualizer)
         mHQEqualizer = null
+    }
+
+    private fun releasePresetReverb() {
+        safeRelease(mPresetReverb)
+        mPresetReverb = null
+    }
+
+    private fun releasePreAmp() {
+        safeRelease(mPresetReverb)
+        mPresetReverb = null
     }
 
 

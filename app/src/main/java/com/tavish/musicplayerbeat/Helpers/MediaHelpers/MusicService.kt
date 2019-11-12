@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.media.session.MediaButtonReceiver.handleIntent
 import com.h6ah4i.android.media.IBasicMediaPlayer
 import com.h6ah4i.android.media.IMediaPlayerFactory
+import com.h6ah4i.android.media.hybrid.HybridMediaPlayerFactory
 import com.h6ah4i.android.media.opensl.OpenSLMediaPlayer
 import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerContext
 import com.h6ah4i.android.media.opensl.OpenSLMediaPlayerFactory
@@ -106,7 +107,8 @@ class MusicService : Service() {
         mService = this
 
         //factory = StandardMediaPlayerFactory(this)
-        factory = OpenSLMediaPlayerFactory(applicationContext)
+     //   factory = OpenSLMediaPlayerFactory(applicationContext)
+        factory = HybridMediaPlayerFactory(applicationContext)
         mMediaPlayer1 = factory!!.createMediaPlayer()
 
 
@@ -255,21 +257,24 @@ class MusicService : Service() {
 
 
     private val onPreparedListener =
-        IBasicMediaPlayer.OnPreparedListener {
-            mMediaPlayerPrepared = true
-            mMediaPlayer1?.setOnCompletionListener(mOnCompletionListener)
-            // mMediaPlayer1?.seekTo(PreferencesHelper.getInstance().getInt(PreferencesHelper.Key.SONG_CURRENT_SEEK_DURATION))
+        object:IBasicMediaPlayer.OnPreparedListener {
+            override fun onPrepared(mp: IBasicMediaPlayer?) {
+                mMediaPlayerPrepared = true
+                mMediaPlayer1?.setOnCompletionListener(mOnCompletionListener)
+                // mMediaPlayer1?.seekTo(PreferencesHelper.getInstance().getInt(PreferencesHelper.Key.SONG_CURRENT_SEEK_DURATION))
 
-            if (mPlayingForFirstTime) {
-                mPlayingForFirstTime = false
+                if (mPlayingForFirstTime) {
+                    mPlayingForFirstTime = false
+                }
+
+                // applyMediaPlayerEQ(getSongDataHelper().getId())
+                startPlaying()
+
+                val intent = Intent(Constants.ACTION_UPDATE_NOW_PLAYING_UI)
+                intent.putExtra(Constants.UPDATE_UI, true)
+                sendBroadcast(intent)
             }
 
-            // applyMediaPlayerEQ(getSongDataHelper().getId())
-            startPlaying();
-
-            val intent = Intent(Constants.ACTION_UPDATE_NOW_PLAYING_UI)
-            intent.putExtra(Constants.UPDATE_UI, true)
-            sendBroadcast(intent)
         }
 
 
@@ -308,6 +313,7 @@ class MusicService : Service() {
         }
 
         try {
+            if(mMediaPlayerPrepared)
             mBundle?.putLong("position", mMediaPlayer1?.currentPosition!!.toLong())
         } catch (e: Exception) {
             e.printStackTrace()
@@ -388,19 +394,24 @@ class MusicService : Service() {
 
         mSong = mSongs[mSongPos]
         mMediaPlayer1?.reset()
+        mMediaPlayerPrepared = false
         try {
             //  val songDataHelper =
+
             mSongDataHelper = SongDataHelper()
             mSongDataHelper?.populateSongData(mContext!!, null, mSongPos)
             //   mApp?.getDBAccessHelper()?.insertSongCount(mSongs.get(mSongPos))
             // mApp?.getDBAccessHelper()?.addToRecentlyPlayed(mSongs.get(mSongPos))
-            mMediaPlayerPrepared = false
             mMediaPlayer1?.setDataSource(mContext!!, getUri(mSongs[mSongPos]._id!!))
-           // mMediaPlayer1?.setOnPreparedListener(onPreparedListener)
-            mMediaPlayer1?.setOnPreparedListener(onPreparedListener)
+           mMediaPlayer1?.setOnPreparedListener(onPreparedListener)
+           // mMediaPlayer1?.setOnPreparedListener(PreparedListener())
             mMediaPlayer1?.setOnErrorListener(onErrorListener)
+
+
+            mMediaPlayer1?.prepare()
             //mMediaPlayer1?.prepareAsync()
-               mMediaPlayer1?.prepare()
+
+
 
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -557,12 +568,13 @@ class MusicService : Service() {
     fun initCustomAudioFX(){
         try {
             openSLMediaPlayerContextParam = OpenSLMediaPlayerContext.Parameters()
-           // openSLMediaPlayerContextParam?.options = OpenSLMediaPlayerContext.OPTION_USE_BASSBOOST
+          // openSLMediaPlayerContextParam?.options = OpenSLMediaPlayerContext.OPTION_USE_PRESET_REVERB
           //  openSLMediaPlayerContextParam?.options = OpenSLMediaPlayerContext.OPTION_USE_HQ_EQUALIZER
+
             openSLMediaPlayerContext= OpenSLMediaPlayerContext(mContext, openSLMediaPlayerContextParam)
             mEqualizerDataHelper = EqualizerDataHelper(
                 factory,
-                mMediaPlayer1!!.audioSessionId,
+                mMediaPlayer1!!,
                 SharedPrefHelper.getInstance().getBoolean(
                     SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE,
                     false
@@ -681,6 +693,26 @@ class MusicService : Service() {
 
     interface PrepareServiceListener {
         fun onServiceRunning(musicService: MusicService)
+    }
+
+    inner class PreparedListener:IBasicMediaPlayer.OnPreparedListener{
+        override fun onPrepared(mp: IBasicMediaPlayer?) {
+            mMediaPlayerPrepared = true
+            mMediaPlayer1?.setOnCompletionListener(mOnCompletionListener)
+            // mMediaPlayer1?.seekTo(PreferencesHelper.getInstance().getInt(PreferencesHelper.Key.SONG_CURRENT_SEEK_DURATION))
+
+            if (mPlayingForFirstTime) {
+                mPlayingForFirstTime = false
+            }
+
+            // applyMediaPlayerEQ(getSongDataHelper().getId())
+            startPlaying()
+
+            val intent = Intent(Constants.ACTION_UPDATE_NOW_PLAYING_UI)
+            intent.putExtra(Constants.UPDATE_UI, true)
+            sendBroadcast(intent)
+        }
+
     }
 
 

@@ -306,7 +306,10 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                             mSongViewer?.scrollToPosition(newPos)
                         }
 
-                        mSeekBar.max = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
+
+                            mSeekBar.max = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
+
+
                         mSeekBar.progress = 0
 
 
@@ -334,6 +337,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             tv_tb_song_title.text = mApp?.mService?.mSong?._title
+
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
         }
 
@@ -374,11 +378,14 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     var seekBarUpdateRunnable: Runnable = object : Runnable {
         override fun run() {
             try {
-                val currentPosition = mApp?.mService?.mMediaPlayer1?.currentPosition
-                val currentPositionInSecs = (currentPosition?.div(1000)) as Int
-                mSeekBar.progress = currentPositionInSecs
+                var currentPosition=0;
+                    if(mApp?.mService?.mMediaPlayerPrepared!!)
+                    currentPosition = mApp?.mService?.mMediaPlayer1?.currentPosition!!
+                    val currentPositionInSecs = (currentPosition?.div(1000)) as Int
+                    mSeekBar.progress = currentPositionInSecs
 
-                tv_current_duration.text = Common.convertMillisToSecs(mSeekBar.progress.times(1000))
+                    tv_current_duration.text =
+                        Common.convertMillisToSecs(mSeekBar.progress.times(1000))
                 mHandler?.postDelayed(this, 100)
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -518,7 +525,9 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
             //  LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, IntentFilter("song_dto"))
             tv_tb_song_title.text = mApp?.mService?.mSong?._title
+
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
+
             if (mApp?.isServiceRunning()!!)
             //     mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
                 mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
