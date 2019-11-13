@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.Menu
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.*
@@ -73,6 +74,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
     private val mEightKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_8)
     private val mSixteenKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_9)
     private val mLoadPresetBtn by binder<AppCompatButton>(R.id.btn_load_preset)
+    private val mSavePresetBtn by binder<AppCompatButton>(R.id.btn_save_preset)
 
 
     private var mSeekBarListener: SeekBar.OnSeekBarChangeListener? = null
@@ -110,6 +112,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         spinner_equalizer_preset.onItemSelectedListener = reverbListener
 
         mLoadPresetBtn.setOnClickListener(this)
+        mSavePresetBtn.setOnClickListener(this)
 
 
 
@@ -366,7 +369,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         btn_toggleEQ = view?.findViewById(R.id.switchButton)
         btn_toggleEQ?.apply {
             isChecked = SharedPrefHelper.getInstance().getBoolean(SharedPrefHelper.Key.IS_EQUALIZER_ACTIVE, false)
-            setOnCheckedChangeListener(eqEnableState);
+            setOnCheckedChangeListener(eqEnableState)
 
         }
         return true
@@ -378,6 +381,12 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
                 loadPresetDialog().show()
 
             }
+            R.id.btn_save_preset -> {
+                val dialog = savePresetDialog()
+                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                dialog.show()
+
+            }
         }
     }
 
@@ -385,8 +394,8 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         val dialogBuilder = AlertDialog.Builder(this)
         val cursor = mApp?.getDBAccessHelper()?.getEQPresets()
         dialogBuilder.setTitle("Preset")
-        dialogBuilder.setCursor(cursor,object:DialogInterface.OnClickListener{
-            override fun onClick(dialog: DialogInterface?, which: Int) {
+        dialogBuilder.setCursor(cursor,
+            { dialog, which ->
                 cursor?.moveToPosition(which)
                 dialog?.dismiss()
                 thirtyOneHzLevel = cursor?.getInt(cursor.getColumnIndex(DBHelper.EQ_31_Hz))!!
@@ -409,12 +418,36 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
                     setEQValues()
                     seekBarSlidersTask()
                 }
-
-            }
-        }, DBHelper.PRESET_NAME)
+                cursor.close()
+            }, DBHelper.PRESET_NAME)
 
         return dialogBuilder.create()
 
+    }
+
+    fun savePresetDialog():AlertDialog{
+        val dialogBuilder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.new_eq_preset_dialog, null)
+
+        val etPreset =dialogView.findViewById<AppCompatEditText>(R.id.et_preset_name)
+
+
+        dialogBuilder.setTitle("Save Preset")
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setNegativeButton("Cancel") { dialog, arg1->dialog.dismiss()}
+        dialogBuilder.setPositiveButton("Done")
+        {dialog, which ->
+
+            val presetName = etPreset.text.toString()
+            mApp?.getDBAccessHelper()?.updateEQValues("ADD",presetName,thirtyOneHzLevel,sixtyTwoHzLevel,oneHunderedTwentyFiveHzLevel,twoHundredFiftyHzLevel,
+                fiveHundredHzLevel,oneKHzLevel,twoKHzLevel,fourKHzLevel,eightKHzLevel,sixteenKHzLevel,virtualizerLevel,bassBoosterLevel,
+                reverbSetting,preAmpLevel)
+
+            Toast.makeText(mContext,"Preset Saved", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+
+        }
+        return dialogBuilder.create()
     }
 
     suspend fun setEQValues(){

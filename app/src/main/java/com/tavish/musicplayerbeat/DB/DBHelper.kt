@@ -29,7 +29,7 @@ class DBHelper(context: Context) :
         val DATABASE_VERSION = 1
         val SONGS_TABLE = "SongsTable"
         val RECENTLY_PLAYED_TABLE = "RecentlyPlayedTable"
-        val _ID = "id"
+        val _ID = "_id"
         val DATE = "date"
 
         /**
