@@ -8,16 +8,21 @@ import android.os.Environment
 import android.preference.PreferenceManager
 
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
@@ -29,43 +34,46 @@ import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 //import com.tavish.musicplayerbeat.Helpers.RequestPermissionHandler
 import com.tavish.musicplayerbeat.Helpers.SongManager
 import com.tavish.musicplayerbeat.Helpers.binder
+import com.tavish.musicplayerbeat.Interfaces.IScrollListener
 import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.R
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.current_playing_bottom_item.view.*
+import kotlinx.android.synthetic.main.fragment_current_playing_bottom_bar.*
+import kotlinx.android.synthetic.main.fragment_current_playing_bottom_bar.view.*
 import java.lang.ref.WeakReference
 
 
-class MainActivity : AppCompatActivity() {
-
-
+class MainActivity : AppCompatActivity(), IScrollListener{
     private val tabLayout by binder<TabLayout>(R.id.tabs)
+
+
     private val appBarLayout by binder<AppBarLayout>(R.id.appBarLayout)
     private lateinit var context:WeakReference<Context>
     private lateinit var mAdapter: TabFragmentAdapter
     private lateinit var mViewPager: ViewPager
-
-
-
     private val COMMON_TAG : String = "CombinedLifeCycle"
+    private var mView:View?=null
+
+
+
     private val ACTIVITY_NAME : String? = MainActivity::class.simpleName
     private val TAG : String = COMMON_TAG
-
-
     //lateinit var readWriteSongPermissionHandler : RequestPermissionHandler
     var songList:MutableList<BeatDto> = mutableListOf()
+
+
     private lateinit var mFragments:MutableList<Fragment>
-
-
-
     lateinit var songManager: SongManager
+
+
+
     var sharedPreferences: SharedPreferences? = null
     lateinit var editor: SharedPreferences.Editor
     var file= Environment.getDataDirectory()
     val storage_check_pref="intent_memory"
     val song_list_pref="intent_songs"
     var current_memory:Float=0.0f
-   // val context = this
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -86,9 +94,9 @@ class MainActivity : AppCompatActivity() {
 
         tabLayout.setupWithViewPager(mViewPager)
 
-        val params = appBarLayout.getLayoutParams() as LinearLayout.LayoutParams
+        val params = appBarLayout.layoutParams as RelativeLayout.LayoutParams
         params.topMargin = Common.getStatusBarHeight(this)
-        appBarLayout.setLayoutParams(params)
+        appBarLayout.layoutParams = params
 
 
 
@@ -111,8 +119,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
 /*
   *//*  interface OnSongReceivedListener {
+
+    // val context = this
+
         fun onPassSongs(listSongs: MutableList<BeatDto>)
     }*//*
 
@@ -145,11 +157,43 @@ class MainActivity : AppCompatActivity() {
             return gson.fromJson<Array<String>>(titles, Array<String>::class.java)
         }*/
     }
+
+    override fun scrollUp() {
+
+   //    val view= LayoutInflater.from(this).inflate(R.layout.activity_main,null)
+        val lp = supportFragmentManager.findFragmentById(R.id.bottom_bar)?.view?.layoutParams as RelativeLayout.LayoutParams
+        val i =lp.bottomMargin+150
+        val abc=supportFragmentManager.findFragmentById(R.id.bottom_bar)?.view
+
+
+        abc?.animate()?.apply {
+            translationY((supportFragmentManager.findFragmentById(R.id.bottom_bar)?.view?.height!!+i).toFloat())
+            interpolator=AccelerateInterpolator(2F)
+            start()
+
+        }
+
+    }
+
+    override fun scrollDown() {
+
+        val abc=supportFragmentManager.findFragmentById(R.id.bottom_bar)?.view
+        abc?.animate()?.apply {
+            translationY(0F)
+            interpolator=DecelerateInterpolator(2F)
+            start()
+        }
+
+    }
+
+
+
+
     fun addFragment(fragment: Fragment) {
 
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.viewpager, fragment) // to be added frag parent layout
+        fragmentTransaction.add(R.id.main_parent, fragment) // to be added frag parent layout
         fragmentTransaction.commitAllowingStateLoss()
 
         mFragments.add(fragment)

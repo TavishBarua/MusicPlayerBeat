@@ -19,6 +19,9 @@ import com.tavish.musicplayerbeat.Activities.MainActivity
 import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.Utils.MusicUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.ArrayList
 
 
@@ -27,9 +30,6 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
     var mContext: Context = context;
     val songList: MutableList<SongDto> = mutableListOf()
     private var mApp: Common? = mContext.applicationContext as? Common
-
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_song_item, parent, false)
@@ -43,7 +43,10 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
     fun update(data: MutableList<SongDto>) {
         songList.clear()
         songList.addAll(data)
-        notifyDataSetChanged()
+        CoroutineScope(Dispatchers.Main).launch {
+            notifyDataSetChanged()
+        }
+
     }
 
     override fun onBindViewHolder(songViewHolder: SongViewHolder, pos: Int) {

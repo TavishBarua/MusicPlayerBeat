@@ -48,7 +48,7 @@ class MusicService : Service() {
     private var mService: Service? = null
     var mSong: SongDto? = null
 
-    var mSongList: MutableList<SongDto>? = null
+    //var mSongList: MutableList<SongDto>? = null
 
 
 
@@ -291,9 +291,16 @@ class MusicService : Service() {
         runBlocking{
              mApp?.getDBAccessHelper()?.saveQueue(mSongs)
              SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.CURRENT_SONG_POSITION, mSongPos)
+            var pos:Int? = 0
+            var dur:Int? = 0
+            if(mMediaPlayerPrepared){
+                pos = mMediaPlayer1?.currentPosition!!
+                dur = mMediaPlayer1?.duration!!
+            }
+
              SharedPrefHelper.getInstance()
-                 .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, mMediaPlayer1?.currentPosition!!)
-             SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SONG_TOTAL_SEEK_DURATION, mMediaPlayer1?.duration!!)
+                 .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION,pos!!)
+             SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SONG_TOTAL_SEEK_DURATION,dur!!)
          }
     }
 
@@ -313,8 +320,13 @@ class MusicService : Service() {
         }
 
         try {
-            if(mMediaPlayerPrepared)
-            mBundle?.putLong("position", mMediaPlayer1?.currentPosition!!.toLong())
+            var abc:Int? = 0
+            if(mMediaPlayerPrepared){
+                abc = mMediaPlayer1?.currentPosition!!
+            }
+
+
+            mBundle?.putLong("position", abc!!.toLong())
         } catch (e: Exception) {
             e.printStackTrace()
             mBundle?.putLong("position", 0)
@@ -408,8 +420,8 @@ class MusicService : Service() {
             mMediaPlayer1?.setOnErrorListener(onErrorListener)
 
 
-            mMediaPlayer1?.prepare()
-            //mMediaPlayer1?.prepareAsync()
+            //mMediaPlayer1?.prepare()
+            mMediaPlayer1?.prepareAsync()
 
 
 

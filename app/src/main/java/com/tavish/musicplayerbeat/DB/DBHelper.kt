@@ -19,6 +19,7 @@ class DBHelper(context: Context) :
 
 
     var mDB: SQLiteDatabase? = null
+    var songs: MutableList<SongDto> = mutableListOf()
 
     private var mContext = context
 
@@ -366,7 +367,14 @@ class DBHelper(context: Context) :
     }
 
     fun getQueue(): MutableList<SongDto> {
-        val songs: MutableList<SongDto> = mutableListOf()
+
+        if(songs.size <= 0){
+           songs= allsongs()
+        }
+        return songs
+    }
+
+    fun allsongs(): MutableList<SongDto>{
         val cursor = getDB()?.rawQuery("SELECT * FROM $SONGS_TABLE", null)
         if (cursor?.moveToFirst()!!) {
             do {
@@ -387,6 +395,7 @@ class DBHelper(context: Context) :
         }
         cursor.close()
         return songs
+
     }
 
     private fun createTableBuilder(

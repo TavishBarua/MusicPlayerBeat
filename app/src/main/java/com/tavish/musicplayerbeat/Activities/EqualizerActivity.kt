@@ -358,6 +358,9 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         mSeekBarVirtualizer?.setOnSeekBarChangeListener(mSeekBarListener)
         mSeekBarPreAmpLevel?.setOnSeekBarChangeListener(mSeekBarListener)
 
+        GlobalScope.launch(Dispatchers.Main){
+            seekBarSlidersTask()
+        }
 
     }
 
@@ -375,6 +378,18 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         return true
     }
 
+/*    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }*/
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_load_preset -> {
@@ -390,7 +405,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun loadPresetDialog(): AlertDialog {
+    private fun loadPresetDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
         val cursor = mApp?.getDBAccessHelper()?.getEQPresets()
         dialogBuilder.setTitle("Preset")
@@ -425,7 +440,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    fun savePresetDialog():AlertDialog{
+    private fun savePresetDialog():AlertDialog{
         val dialogBuilder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.new_eq_preset_dialog, null)
 
@@ -436,12 +451,13 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         dialogBuilder.setView(dialogView)
         dialogBuilder.setNegativeButton("Cancel") { dialog, arg1->dialog.dismiss()}
         dialogBuilder.setPositiveButton("Done")
-        {dialog, which ->
+        { dialog, _ ->
 
             val presetName = etPreset.text.toString()
             mApp?.getDBAccessHelper()?.updateEQValues("ADD",presetName,thirtyOneHzLevel,sixtyTwoHzLevel,oneHunderedTwentyFiveHzLevel,twoHundredFiftyHzLevel,
                 fiveHundredHzLevel,oneKHzLevel,twoKHzLevel,fourKHzLevel,eightKHzLevel,sixteenKHzLevel,virtualizerLevel,bassBoosterLevel,
                 reverbSetting,preAmpLevel)
+
 
             Toast.makeText(mContext,"Preset Saved", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
@@ -450,7 +466,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         return dialogBuilder.create()
     }
 
-    suspend fun setEQValues(){
+    private suspend fun setEQValues(){
         val currentEQvalues = mApp?.getDBAccessHelper()?.getEQValues()!!
         withContext(Dispatchers.IO){
             if(currentEQvalues[14]==1){
@@ -465,7 +481,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    suspend fun seekBarSlidersTask(){
+    private suspend fun seekBarSlidersTask(){
         lateinit var eqValues:Array<Int?>
 
         withContext(Dispatchers.IO){
@@ -511,7 +527,7 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    fun obtainPalleteView() {
+    private fun obtainPalleteView() {
         mSpinnerPreset = findViewById(R.id.spinner_equalizer_preset)
         mSeekBarVirtualizer = findViewById(R.id.seekbar_virtualizer)
         mSeekBarBassBoost = findViewById(R.id.seekbar_bassbooster)

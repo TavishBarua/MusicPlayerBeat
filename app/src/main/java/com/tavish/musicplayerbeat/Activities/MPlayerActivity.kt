@@ -306,8 +306,11 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                             mSongViewer?.scrollToPosition(newPos)
                         }
 
-
-                            mSeekBar.max = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
+                        var abc:Int? = 0
+                        if(mApp?.mService?.mMediaPlayerPrepared!!){
+                            abc = mApp?.mService?.mMediaPlayer1?.currentPosition!!
+                        }
+                            mSeekBar.max = abc?.div(1000)!!
 
 
                         mSeekBar.progress = 0
@@ -338,6 +341,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             }
             tv_tb_song_title.text = mApp?.mService?.mSong?._title
 
+            if(mApp?.mService?.mMediaPlayerPrepared!!)
             tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
         }
 
@@ -381,7 +385,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                 var currentPosition=0;
                     if(mApp?.mService?.mMediaPlayerPrepared!!)
                     currentPosition = mApp?.mService?.mMediaPlayer1?.currentPosition!!
-                    val currentPositionInSecs = (currentPosition?.div(1000)) as Int
+                    val currentPositionInSecs = (currentPosition.div(1000)) as Int
                     mSeekBar.progress = currentPositionInSecs
 
                     tv_current_duration.text =
@@ -526,7 +530,12 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             //  LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, IntentFilter("song_dto"))
             tv_tb_song_title.text = mApp?.mService?.mSong?._title
 
-            tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
+            var dur:Int? = 0
+            if(mApp?.mService?.mMediaPlayerPrepared!!){
+                dur = mApp?.mService?.mMediaPlayer1?.duration!!
+            }
+
+            tv_total_duration.text = Common.convertMillisToSecs(dur!!)
 
             if (mApp?.isServiceRunning()!!)
             //     mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
