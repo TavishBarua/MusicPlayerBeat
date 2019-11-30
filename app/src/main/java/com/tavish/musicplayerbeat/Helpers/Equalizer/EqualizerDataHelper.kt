@@ -10,23 +10,23 @@ import com.h6ah4i.android.media.standard.audiofx.StandardPresetReverb
 
 
 class EqualizerDataHelper(factory: IMediaPlayerFactory?, player:IBasicMediaPlayer, equalizer:Boolean, openSLMediaPlayerContext: OpenSLMediaPlayerContext) : IReleasable {
-    private var mHQEqualizer: IEqualizer? = null
-    private var mHQVisualizer: IHQVisualizer? = null
-    private var mVirtualizer: IVirtualizer? = null
-    private var mBassBoost: IBassBoost? = null
+    private var _mFactory = factory
+    private var mEqualizerStatus: Boolean? = equalizer
+    private var mPlayer: IBasicMediaPlayer? = player
+    private var mHQEqualizer: IEqualizer? = createHQEqualizer()
+    private var mHQVisualizer: IHQVisualizer? = createHQVizualizer()
+    private var mVirtualizer: IVirtualizer? = createVirtualizer()
+    private var mBassBoost: IBassBoost? = createBassBoost()
+    private var mPresetReverb: IPresetReverb? = createPresetReverb()
+    private var mPreAmp: IPreAmp? = createPreAmp()
     private var mLoudnessEnhancer: ILoudnessEnhancer? = null
     private var mEnvironmentalReverb: IEnvironmentalReverb? = null
-    private var mPresetReverb: IPresetReverb? = null
-    private var mPreAmp: IPreAmp? = null
-    private var mPlayer: IBasicMediaPlayer? = player
-    private var mEqualizerStatus: Boolean? = equalizer
+
+
     private var mOpenSLMediaPlayerContext: OpenSLMediaPlayerContext? = openSLMediaPlayerContext
 
-    private var _mFactory = factory
+
 //val mVirtualizer:OpenSLVirtualizer? = OpenSLVirtualizer(OpenSLMediaPlayerContext(mContext,get))
-
-
-
 
      fun createHQEqualizer(): IEqualizer? {
         if (mHQEqualizer == null) {

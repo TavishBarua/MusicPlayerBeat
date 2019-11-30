@@ -73,7 +73,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0-RC3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.71'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.71'
 
     implementation 'com.yarolegovich:discrete-scrollview:1.4.9'
     implementation 'com.ramotion.navigationtoolbar:navigation-toolbar:0.1.3'

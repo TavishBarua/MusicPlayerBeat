@@ -13,13 +13,13 @@ import java.util.ArrayList
 
 class Playback(context: Context): MusicService.PrepareServiceListener{
 
-
+/*
     companion object {
 
         val PLAY_PAUSE_SONG = 230
         val PLAY_SONGS = 231
 
-    }
+    }*/
 
     private var SONG_CASE = 0
     private var WHICH_CASE = 0
@@ -37,7 +37,7 @@ class Playback(context: Context): MusicService.PrepareServiceListener{
         mSongs = songs
         mPos = pos
         SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, 0)
-        WHICH_CASE = PLAY_SONGS
+        WHICH_CASE = Constants.PLAY_SONGS
         if (!mApp.isServiceRunning())
             startService()
         else {
@@ -115,9 +115,17 @@ class Playback(context: Context): MusicService.PrepareServiceListener{
             mApp.mService?.playPauseSong()
         }
         Constants.PLAY_SONGS->{
-            mApp.mService!!.setSongList(mSongs!!)
-            mApp.mService!!.setSelectedSong(mPos)
+           /* mApp.mService?.apply {
+                setSongList(mSongs)
+                setSelectedSong(mPos)
+            }*/
 
+            mApp.mService?.setSongList(mSongs!!)
+            mApp.mService?.setSelectedSong(mPos)
+
+        }
+        Constants.PLAY_PAUSE_SONG_FROM_BOTTOM_BAR->{
+            mApp.mService?.setSelectedSong(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.CURRENT_SONG_POSITION,0))
         }
 
 
