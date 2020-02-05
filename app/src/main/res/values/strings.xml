@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">MusicPlayerBeat</string>
+    <string name="app_name">BeatDrop</string>
 
     <string-array name="theme_array">
         <item>Light</item>
@@ -20,6 +20,13 @@
         <xliff:g id="format">%1$d:%2$02d:%3$02d</xliff:g>
     </string>
 
+    <string name="song_count"><xliff:g id="count">%d</xliff:g> song</string>
+    <string name="songs_count"><xliff:g id="count">%d</xliff:g> songs</string>
+    <string name="album_count"><xliff:g id="count">%d</xliff:g> album</string>
+    <string name="albums_count"><xliff:g id="count">%d</xliff:g> albums</string>
+    <string name="artist_count"><xliff:g id="count">%d</xliff:g> artist</string>
+    <string name="artists_count"><xliff:g id="count">%d</xliff:g> artists</string>
+
     <string name="grant_permission">Grant Permission!</string>
     <string name="grant_permission_message">You will have to grant permission from settings.\nOpen Settings?</string>
     <string name="yes">Yes</string>
@@ -33,6 +40,7 @@
     <string name="will_be_played_next">will be played next.</string>
     <string name="added_to_queue"> added to queue.</string>
     <string name="queue_is_empty">Queue is empty.</string>
+
 
 </resources>
 

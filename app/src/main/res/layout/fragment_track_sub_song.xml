@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fl_track_sub_song"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/velvet_white"
+        tools:context=".Fragments.TrackSubSongFragment">
+
+    <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/album_art_track_bg"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <RelativeLayout
+                android:id="@+id/rr_header_track_song"
+                android:layout_centerInParent="true"
+                android:background="#66000000"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/header_track_song_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Album"
+                    android:textSize="24sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/sub_track_song_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/header_track_song_text"
+                    android:gravity="center"
+                    android:text="Name"
+                    android:textSize="18sp" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_track"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/sub_track_song_text"
+                    android:layout_centerInParent="true"
+                    android:background="?selectableItemBackground"
+                    android:src="@mipmap/btn_play" />
+
+
+        </RelativeLayout>
+        <RelativeLayout
+                android:id="@+id/rr_track_song_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_round_corner"
+                android:layout_below="@+id/rr_header_track_song">
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_sub_track_song_list"
+                       android:background="?selectableItemBackground"
+                        android:layout_marginStart="25dp"
+                        android:layout_marginEnd="25dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+</FrameLayout>

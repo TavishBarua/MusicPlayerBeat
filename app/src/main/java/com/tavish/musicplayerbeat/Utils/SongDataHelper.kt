@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import com.squareup.picasso.Picasso
+import com.tavish.musicplayerbeat.Activities.MPlayerActivity
 import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Models.SongDto
 import java.lang.Exception
@@ -51,6 +52,7 @@ class SongDataHelper {
                 mDuration = _duration!!
                 mFilePath = _path
                 mAlbumArtPath = MusicUtils.getAlbumArtUri(_albumId!!).toString()
+               // mAlbumArtPath = (context as MPlayerActivity).intent?.extras?.get("data").toString()
 
 
             }

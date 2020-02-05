@@ -19,6 +19,8 @@ import com.tavish.musicplayerbeat.DB.DBHelper
 import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Helpers.binder
 import com.tavish.musicplayerbeat.R
+import com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+import com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.OnBeatRangeSeekBarListener
 import kotlinx.android.synthetic.main.activity_equalizer.*
 import kotlinx.coroutines.*
 
@@ -63,21 +65,23 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
     private var mSeekBarPreAmpLevel: SeekBar? = null
 
 
-    private val mThirtyOneHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_0)
-    private val mSixtyTwoHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_1)
-    private val mOneHunderedTwentyFiveHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_2)
-    private val mTwoHundredFiftyHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_3)
-    private val mFiveHundredHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_4)
-    private val mOneKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_5)
-    private val mTwoKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_6)
-    private val mFourKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_7)
-    private val mEightKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_8)
-    private val mSixteenKHzSeekBar by binder<SeekBar>(R.id.seekbar_equalizer_band_9)
+  /*  private val mThirtyOneHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_0)
+    private val mSixtyTwoHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_1)
+    private val mOneHunderedTwentyFiveHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_2)
+    private val mTwoHundredFiftyHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_3)
+    private val mFiveHundredHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_4)
+    private val mOneKHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_5)
+    private val mTwoKHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_6)
+    private val mFourKHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_7)
+    private val mEightKHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_8)
+    private val mSixteenKHzSeekBar by binder<BeatRangeBarView>(R.id.seekbar_equalizer_band_9)*/
     private val mLoadPresetBtn by binder<AppCompatButton>(R.id.btn_load_preset)
     private val mSavePresetBtn by binder<AppCompatButton>(R.id.btn_save_preset)
 
 
-    private var mSeekBarListener: SeekBar.OnSeekBarChangeListener? = null
+    private var mSeekBarListener1: SeekBar.OnSeekBarChangeListener? = null
+   // private var mSeekBarListener: OnBeatRangeSeekBarListener? = null
+   // private var mSeekBarListener: BeatRangeBarView.OnBeatRangeBarListener? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,10 +118,207 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
 
 
 
-        mToolbar?.setNavigationOnClickListener { v -> onBackPressed() }
+        mToolbar?.setNavigationOnClickListener { onBackPressed() }
         obtainPalleteView()
-        mSeekBarListener = object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, seekBarProg: Int, fromUser: Boolean) {
+
+
+        sb_thirty_one_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e31hztxt.text="0"
+            else if (progressVal>16){
+                e31hztxt.text=(progressVal-16).toString()
+            }else{
+                e31hztxt.text="-"+(16-progressVal)
+            }
+            val thirtyOneHz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+            ?.getBand(31000)
+            seekBarValueChanger(progressVal, thirtyOneHz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_thirty_one_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            thirtyOneHzLevel = progressVal}
+
+        sb_sixty_two_hz.setOnProgressChangeListener { progressVal->
+
+            if(progressVal==16)
+                e62hztxt.text="0"
+            else if (progressVal>16){
+                e62hztxt.text=(progressVal-16).toString()
+            }else{
+                e62hztxt.text="-"+(16-progressVal)
+            }
+            val sixtyTwoHz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(62000)
+            seekBarValueChanger(progressVal, sixtyTwoHz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_sixty_two_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            sixtyTwoHzLevel = progressVal
+        }
+
+
+        sb_one_twentyfive_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e125hztxt.text="0"
+            else if (progressVal>16){
+                e125hztxt.text=(progressVal-16).toString()
+            }else{
+                e125hztxt.text="-"+(16-progressVal)
+            }
+
+            val oneTwentyFive =
+                mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                    ?.getBand(125000)
+            seekBarValueChanger(progressVal, oneTwentyFive)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_one_twentyfive_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+
+            oneHunderedTwentyFiveHzLevel = progressVal
+        }
+
+        sb_two_fifty_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e250hztxt.text="0"
+            else if (progressVal>16){
+                e250hztxt.text=(progressVal-16).toString()
+            }else{
+                e250hztxt.text="-"+(16-progressVal)
+            }
+
+            val twoFiftyHz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(250000)
+            seekBarValueChanger(progressVal, twoFiftyHz)
+
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_two_fifty_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+
+            fiveHundredHzLevel = progressVal
+
+        }
+
+
+        sb_five_hundred_hz.setOnProgressChangeListener { progressVal->
+
+            if(progressVal==16)
+                e500hztxt.text="0"
+            else if (progressVal>16){
+                e500hztxt.text=(progressVal-16).toString()
+            }else{
+                e500hztxt.text="-"+(16-progressVal)
+            }
+            val fiveHundredHz =
+                mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                    ?.getBand(500000)
+            seekBarValueChanger(progressVal, fiveHundredHz)
+
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_five_hundred_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+
+            fiveHundredHzLevel = progressVal
+        }
+
+
+
+        sb_one_kilo_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e1khztxt.text="0"
+            else if (progressVal>16){
+                e1khztxt.text=(progressVal-16).toString()
+            }else{
+                e1khztxt.text="-"+(16-progressVal)
+            }
+            val oneKhz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(1000000)
+            seekBarValueChanger(progressVal, oneKhz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_one_kilo_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+
+            oneKHzLevel = progressVal
+        }
+
+
+
+        sb_two_kilo_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e2khztxt.text="0"
+            else if (progressVal>16){
+                e2khztxt.text=(progressVal-16).toString()
+            }else{
+                e2khztxt.text="-"+(16-progressVal)
+            }
+            val twoKhz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(2000000)
+            seekBarValueChanger(progressVal, twoKhz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_one_kilo_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            twoKHzLevel = progressVal
+        }
+
+        sb_four_kilo_hz.setOnProgressChangeListener { progressVal->
+
+            if(progressVal==16)
+                e4khztxt.text="0"
+            else if (progressVal>16){
+                e4khztxt.text=(progressVal-16).toString()
+            }else{
+                e4khztxt.text="-"+(16-progressVal)
+            }
+            val fourKhz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(8000000)
+            seekBarValueChanger(progressVal, fourKhz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_four_kilo_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            fourKHzLevel = progressVal
+        }
+
+        sb_eight_kilo_hz.setOnProgressChangeListener { progressVal->
+
+            if(progressVal==16)
+                e8khztxt.text="0"
+            else if (progressVal>16){
+                e8khztxt.text=(progressVal-16).toString()
+            }else{
+                e8khztxt.text="-"+(16-progressVal)
+            }
+            val eightKhz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(8000000)
+            seekBarValueChanger(progressVal, eightKhz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_eight_kilo_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            eightKHzLevel = progressVal
+        }
+
+        sb_sixteen_kilo_hz.setOnProgressChangeListener { progressVal->
+            if(progressVal==16)
+                e16khztxt.text="0"
+            else if (progressVal>16){
+                e16khztxt.text=(progressVal-16).toString()
+            }else{
+                e16khztxt.text="-"+(16-progressVal)
+            }
+            val sixteenKhz = mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()
+                ?.getBand(16000000)
+            seekBarValueChanger(progressVal, sixteenKhz)
+            if ((progressVal == 31 || progressVal == 0)) {
+                sb_sixteen_kilo_hz.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+            sixteenKHzLevel = progressVal
+        }
+
+
+       /* mSeekBarListener = object : OnBeatRangeSeekBarListener {
+            override fun onProgressChanged(
+                seekBar: BeatRangeBarView?,
+                seekBarProg: Int,
+                fromUser: Boolean
+            ) {
                 when (seekBar?.id) {
                     //31Hz
                     R.id.seekbar_equalizer_band_0 -> {
@@ -291,6 +492,27 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
                         sixteenKHzLevel = seekBarProg
                     }
 
+
+
+                }
+            }
+
+
+            override fun onStartTrackingTouch(seekBar: BeatRangeBarView?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: BeatRangeBarView?) {
+
+            }
+
+
+
+        }*/
+
+        mSeekBarListener1 = object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, seekBarProg: Int, fromUser: Boolean) {
+                when (seekBar?.id){
                     R.id.seekbar_bassbooster -> {
                         bassBoosterLevel = seekBarProg.toShort()
                         if (mApp?.isServiceRunning()!!) {
@@ -326,7 +548,6 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
 
 
                     }
-
                 }
             }
 
@@ -337,12 +558,9 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
 
             }
-
-
         }
-
-
-        mThirtyOneHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
+/*
+        mThirtyOneHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
         mSixtyTwoHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
         mOneHunderedTwentyFiveHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
         mTwoHundredFiftyHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
@@ -351,10 +569,20 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
         mTwoKHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
         mFourKHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
         mEightKHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
-        mSixteenKHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)
-        mSeekBarBassBoost?.setOnSeekBarChangeListener(mSeekBarListener)
-        mSeekBarVirtualizer?.setOnSeekBarChangeListener(mSeekBarListener)
-        mSeekBarPreAmpLevel?.setOnSeekBarChangeListener(mSeekBarListener)
+        mSixteenKHzSeekBar.setOnSeekBarChangeListener(mSeekBarListener)*/
+     /*   mThirtyOneHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mSixtyTwoHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mOneHunderedTwentyFiveHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mTwoHundredFiftyHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mFiveHundredHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mOneKHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mTwoKHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mFourKHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mEightKHzSeekBar.setOnProgressChangeListener{mSeekBarListener}
+        mSixteenKHzSeekBar.setOnProgressChangeListener{mSeekBarListener}*/
+        mSeekBarBassBoost?.setOnSeekBarChangeListener(mSeekBarListener1)
+        mSeekBarVirtualizer?.setOnSeekBarChangeListener(mSeekBarListener1)
+        mSeekBarPreAmpLevel?.setOnSeekBarChangeListener(mSeekBarListener1)
 
             seekBarSlidersTask()
 
@@ -511,16 +739,16 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
             reverbSetting = eqValues[13]?.toShort()!!
 
 
-            mThirtyOneHzSeekBar.progress = thirtyOneHzLevel
-            mSixtyTwoHzSeekBar.progress = sixtyTwoHzLevel
-            mOneHunderedTwentyFiveHzSeekBar.progress = oneHunderedTwentyFiveHzLevel
-            mTwoHundredFiftyHzSeekBar.progress = twoHundredFiftyHzLevel
-            mFiveHundredHzSeekBar.progress =  fiveHundredHzLevel
-            mOneKHzSeekBar.progress = oneKHzLevel
-            mTwoKHzSeekBar.progress = twoKHzLevel
-            mFourKHzSeekBar.progress = fourKHzLevel
-            mEightKHzSeekBar.progress = eightKHzLevel
-            mSixteenKHzSeekBar.progress = sixteenKHzLevel
+            sb_thirty_one_hz.progress = thirtyOneHzLevel
+            sb_sixty_two_hz.progress = sixtyTwoHzLevel
+            sb_one_twentyfive_hz.progress = oneHunderedTwentyFiveHzLevel
+            sb_two_fifty_hz.progress = twoHundredFiftyHzLevel
+            sb_five_hundred_hz.progress =  fiveHundredHzLevel
+            sb_one_kilo_hz.progress = oneKHzLevel
+            sb_two_kilo_hz.progress = twoKHzLevel
+            sb_four_kilo_hz.progress = fourKHzLevel
+            sb_eight_kilo_hz.progress = eightKHzLevel
+            sb_sixteen_kilo_hz.progress = sixteenKHzLevel
             mSeekBarVirtualizer?.progress = virtualizerLevel?.toInt()!!
             mSeekBarBassBoost?.progress = bassBoosterLevel?.toInt()!!
             mSeekBarPreAmpLevel?.progress = preAmpLevel?.toInt()!!
@@ -656,9 +884,9 @@ class EqualizerActivity : AppCompatActivity(), View.OnClickListener {
             } else
                 mApp?.mService?.getEqualizerHelper()?.getHQEqualizer()?.setBandLevel(
                     hertzValue!!,
-                    (if (seekBarProg!! > 16) ((seekBarProg.minus(16)) * 100).toShort() else (-(seekBarProg.plus(
-                        16
-                    )) * 100).toShort())
+                    (if (seekBarProg!! > 16)
+                            ((seekBarProg.minus(16))*100).toShort()
+                    else ((-seekBarProg!!+16) * 100).toShort())
                 )
         }
     }

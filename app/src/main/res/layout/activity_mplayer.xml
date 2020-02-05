@@ -1,47 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rr_mplayer"
+        style="@style/AppBaseTheme"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        style="@style/AppBaseTheme"
         tools:context=".Activities.MPlayerActivity">
-    <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/id_toolbar_container"
+
+ <!--   <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null"
+            android:layout_height="?attr/actionBarSize"
             android:elevation="0dp"
-            android:weightSum="1"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:elevation="0dp">
+            app:elevation="0dp"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">-->
 
 
-        <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:elevation="0dp"
-                app:elevation="0dp"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_tb_song_title"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="Song Title"
+                android:transitionName="song_title" />
 
-
-            <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_tb_song_title"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:text="Song Title"
-                    android:gravity="center"
-                    android:layout_gravity="center"/>
-
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+   <!-- </androidx.appcompat.widget.Toolbar>-->
 
 
     <RelativeLayout
@@ -51,16 +43,16 @@
             android:orientation="vertical">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_margin="70dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?selectableItemBackground"
-                app:srcCompat="@drawable/btn_repeat_off"/>
+                android:layout_margin="70dp">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btn_repeat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    app:srcCompat="@drawable/btn_repeat_off" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/btn_equalizer"
@@ -68,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:background="?selectableItemBackground"
-                    app:srcCompat="@drawable/drawable_overflow"/>
+                    app:srcCompat="@drawable/drawable_overflow" />
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -78,126 +70,119 @@
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true" />
 
-        <androidx.cardview.widget.CardView
-                android:id="@+id/cv_mplayer_main"
-                style="@style/AppBaseTheme"
-                android:layout_above="@+id/viewPager"
-                android:layout_alignParentBottom="true"
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/ll_mplayer_main"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/ll_mplayer_main"
+                    android:id="@+id/ll_two"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
 
-                <RelativeLayout
-                        android:id="@+id/ll_play_pause"
-                        android:layout_marginTop="15dp"
-                        android:layout_gravity="center"
-                        android:orientation="horizontal"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/bg_circle">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/img_play_pause"
-                            android:padding="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:background="?selectableItemBackground"
-                            app:srcCompat="@drawable/pause"/>
-
-                </RelativeLayout>
+                <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/seekBar1"
+                        android:layout_width="300dp"
+                        android:layout_height="5dp"
+                        android:indeterminate="false"
+                        android:maxHeight="5dip"
+                        android:minHeight="5dip"
+                        android:progressDrawable="@drawable/seekbar_progress"
+                        android:thumbTint="@android:color/transparent" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                        android:id="@+id/ll_two"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:gravity="end"
+                        android:layout_marginEnd="5dp"
+                        android:orientation="horizontal">
 
-                    <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent"
-                                                                  android:layout_height="wrap_content"
-                                                                  android:layout_marginLeft="20dp"
-                                                                  android:layout_marginRight="20dp"
-                                                                  android:orientation="horizontal"
-                                                                  android:weightSum="1">
-
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/songCurrentDurationLabel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="0.5"
-                                android:text="0:00"
-                                android:gravity="start"
-                                style="?text_color"/>
-                        <!-- Total Duration Label -->
-                        <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/songTotalDurationLabel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="0.5"
-                                android:gravity="end"
-                                android:text="Buffering..."
-                                style="?text_color"/>
-                    </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-                    <androidx.appcompat.widget.AppCompatSeekBar
-                            android:id="@+id/seekBar1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginRight="15dp"
-                            android:indeterminate="false"
-                            android:maxHeight="3dip"
-                            android:minHeight="3dip"
-                            android:thumbTint="@android:color/transparent"
-                            android:progressDrawable="@drawable/seekbar_progress"
-                    />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                        android:id="@+id/ll_mplayer_three"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:weightSum="1">
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                            android:id="@+id/btn_prev"
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/songCurrentDurationLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="?selectableItemBackground"
-                            android:layout_weight="0.5"
-                            android:src="@mipmap/btn_prev"/>
+                            android:gravity="start"
+                            android:text="0:00"
+                            android:fontFamily="@font/opensanslight"
+                            android:textSize="24sp" />
 
-                    <View android:layout_width="40dp"
-                          android:layout_height="match_parent"
-                    />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                            android:id="@+id/btn_next"
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/slash"
+                            style="?text_color"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="?selectableItemBackground"
-                            android:layout_weight="0.5"
-                            android:src="@mipmap/btn_next"/>
-
+                            android:fontFamily="@font/opensanslight"
+                            android:text=" / " />
+                    <!-- Total Duration Label -->
+                    <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/songTotalDurationLabel"
+                            style="?text_color"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/opensanslight"
+                            android:text="Buffering..." />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-        </androidx.cardview.widget.CardView>
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/ll_mplayer_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_prev"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="?selectableItemBackground"
+                        android:src="@mipmap/btn_prev" />
+
+                <RelativeLayout
+                        android:id="@+id/ll_play_pause"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_circle"
+                        android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/img_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:background="?selectableItemBackground"
+                            android:padding="5dp"
+                            app:srcCompat="@drawable/pause" />
+
+                </RelativeLayout>
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/btn_next"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:background="?selectableItemBackground"
+                        android:src="@mipmap/btn_next" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </RelativeLayout>
 

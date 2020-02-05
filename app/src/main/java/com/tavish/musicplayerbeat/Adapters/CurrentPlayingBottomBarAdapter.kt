@@ -1,34 +1,37 @@
 package com.tavish.musicplayerbeat.Adapters
 
 import android.content.ContentUris
-import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.widget.ImageViewCompat
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.tavish.musicplayerbeat.Activities.MPlayerActivity
-import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Fragments.CurrentPlayingBottomBarFragment
+import com.tavish.musicplayerbeat.Interfaces.SharedResourceOnItemClickFragment
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
-import kotlinx.android.synthetic.main.current_playing_bottom_item.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CurrentPlayingBottomBarAdapter( fragment:CurrentPlayingBottomBarFragment) :
+
+
+
+class CurrentPlayingBottomBarAdapter(songs:MutableList<SongDto>, sharedInterfaceFragment:SharedResourceOnItemClickFragment) :
     RecyclerView.Adapter<CurrentPlayingBottomBarAdapter.ItemViewHolder>() {
+
+
     var mFragment:CurrentPlayingBottomBarFragment?=null
+    var mSongs: MutableList<SongDto>? = null
+    var mSharedInterfaceFragment:SharedResourceOnItemClickFragment? = null
     init {
-        mFragment=fragment
+      //  mFragment=fragment
+        mSongs = songs
+        mSharedInterfaceFragment = sharedInterfaceFragment
     }
 
   //  var mContext: Context = context
@@ -54,9 +57,14 @@ class CurrentPlayingBottomBarAdapter( fragment:CurrentPlayingBottomBarFragment) 
             .load(uri)
             .placeholder(R.mipmap.ic_launcher_round)
             .into(holder.songImage)
-
         holder.title?.text = songList[holder.adapterPosition]._title
-            holder.artist?.text = songList[holder.adapterPosition]._artist
+        holder.artist?.text = songList[holder.adapterPosition]._artist
+       // holder.songImage?.transitionName+=position
+      //  ViewCompat.setTransitionName(holder.songImage!!, holder.songImage?.transitionName)
+        holder.songImage?.transitionName = "song_image$position"
+
+        holder.itemView.setOnClickListener { mSharedInterfaceFragment?.onSongItemClickFragment(holder.adapterPosition, mSongs!!,holder.songImage!!) }
+      //  holder.itemView.setOnClickListener{ mFragment?.startActivity(Intent(mFragment!!.activity, MPlayerActivity::class.java)) }
 
 
     }
@@ -80,7 +88,30 @@ class CurrentPlayingBottomBarAdapter( fragment:CurrentPlayingBottomBarFragment) 
             title = itemView?.findViewById(R.id.txt_bottom_title)
             artist = itemView?.findViewById(R.id.txt_bottom_artist)
             songImage=itemView?.findViewById(R.id.img_bottom_song)
-            itemView?.setOnClickListener{ mFragment?.startActivity(Intent(mFragment!!.activity, MPlayerActivity::class.java)) }
+
+
+
+          /*  itemView?.setOnClickListener{
+                val intent = Intent(mFragment!!.activity, MPlayerActivity::class.java)
+              //  val pairs = arrayOfNulls<androidx.core.util.Pair<View,String>>(3)
+                val p1 = androidx.core.util.Pair.create<View,String>(title!!,"song_title")
+            //    pairs[1] = Pair<View,String>(artist!!,"song_title")
+                val p2 = androidx.core.util.Pair.create<View,String>(songImage!!,"song_image")
+                //val options = ActivityOptions.makeSceneTransitionAnimation(mFragment!!.activity,p1, p2)
+                val fragment = PlayerPagerFragment.newInstance(ContentUris.withAppendedId(
+                    Constants.sArtworkUri,
+                    songList[adapterPosition]._albumId!!),ViewCompat.getTransitionName(songImage!!)!!)
+
+                mFragment?.fragmentManager
+                    ?.beginTransaction()
+                    ?.setReorderingAllowed(true)
+                    ?.addSharedElement(songImage!!,songImage?.transitionName!!)
+                    ?.replace(R.id.frag_cardview, fragment)
+                    ?.addToBackStack(null)
+                    ?.commit()
+
+             //   mFragment?.startActivity(Intent(mFragment!!.activity, MPlayerActivity::class.java))
+            }*/
         }
 
 

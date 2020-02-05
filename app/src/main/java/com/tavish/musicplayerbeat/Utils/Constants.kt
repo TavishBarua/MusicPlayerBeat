@@ -51,8 +51,8 @@ class Constants{
       const val PLAY_PAUSE_SONG_FROM_BOTTOM_BAR = 238
       const val PICK_FROM_GALLERY = 239
 
-      const val HEADER_TITLE = "HEADER_TITLE"
-      const val HEADER_SUB_TITLE = "HEADER_SUB_TITLE"
+      const val TRACK_HEADER_TITLE = "HEADER_TITLE"
+      const val TRACK_HEADER_SUB_TITLE = "HEADER_SUB_TITLE"
       const val FROM_WHERE = "FROM_WHERE"
       const val SELECTION_VALUE = "SELECTION_VALUE"
 
@@ -62,6 +62,9 @@ class Constants{
         const val COVER_PATH = "COVER_PATH"
 
         const val UPDATE_UI = "UPDATE_UI"
+
+        const val DESCENDING = " DESC"
+        const val ASCENDING = " ASC"
 
         //Repeat mode constants.
         const val REPEAT_OFF = 0

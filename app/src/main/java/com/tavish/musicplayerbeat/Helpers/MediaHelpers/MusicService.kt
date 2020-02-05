@@ -269,6 +269,8 @@ class MusicService : Service() {
                 else if (repeat_pref == Constants.REPEAT_PLAYLIST) startSong()
             }
         } else if (repeat_pref == Constants.REPEAT_SONG) {
+            SharedPrefHelper.getInstance()
+                .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, 0)
             startSong()
         }
 

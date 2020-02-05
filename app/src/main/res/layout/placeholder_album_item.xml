@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+<FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="0.65"
+                    android:orientation="vertical"
+                    android:weightSum="1">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_grid_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:ellipsize="marquee"
+                        android:layout_marginTop="15dp"
+                        android:fontFamily="@font/opensanslight"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:textAllCaps="true"
+                        android:text="Song Name"
+                        android:textColor="#05050F"
+                        android:textSize="18sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_grid_sub_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/opensanslight"
+                        android:singleLine="true"
+                        android:text="Artist Name"
+                        android:textColor="#05050F"
+                        android:textSize="14sp" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+</FrameLayout>
+
+    <FrameLayout
+            android:layout_gravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/img_grid_Album"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_margin="15dp"
+                android:adjustViewBounds="true"
+                android:rotation="325"
+                android:transitionName="song_image"
+                android:background="@drawable/rounded_corner"
+                android:scaleType="fitXY"
+                android:src="@mipmap/ic_launcher_round" />
+
+    </FrameLayout>
+
+</FrameLayout>

@@ -1,0 +1,19 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="oval">
+            <size
+                    android:width="27dp"
+                    android:height="27dp" />
+            <solid android:color="@color/thumb_placeholderBackground" />
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/ic_eq_thumb"
+            android:top="6dp"
+            android:bottom="6dp"
+            android:left="6dp"
+            android:right="6dp" />
+
+
+</layer-list>

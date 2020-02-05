@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,6 +21,7 @@ import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Models.SongDto
 
 import com.tavish.musicplayerbeat.R
+import com.tavish.musicplayerbeat.Utils.MusicUtils
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +29,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_album.*
+import kotlinx.android.synthetic.main.fragment_artist.*
 import java.util.*
 
 
@@ -84,6 +88,14 @@ class AlbumFragment : Fragment() {
         super.onDetach()
         mCompositeDisposable?.clear()
         mCompositeDisposable?.dispose()
+    }
+
+    fun removeFragment(){
+        MusicUtils.slideInFragmentAnimation(fl_frag_album,activity!!, this)
+    }
+
+    fun addFragment(){
+        MusicUtils.slideOutFragmentAnimation(fl_frag_album)
     }
 
 

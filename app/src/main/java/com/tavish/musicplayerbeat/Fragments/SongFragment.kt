@@ -70,10 +70,10 @@ class SongFragment : Fragment(){
     ): View? {
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_song, container, false)
-        recyclerView= view.findViewById(R.id.rr_songs)
+       /* recyclerView= view.findViewById(R.id.rr_songs)
         recyclerView.layoutManager= LinearLayoutManager(activity,RecyclerView.VERTICAL,false)
         songAdapter = SongAdapter(mContext)
-        recyclerView.adapter=songAdapter
+        recyclerView.adapter=songAdapter*/
 
         recyclerView.run {
             recyclerView= findViewById(R.id.rr_songs)

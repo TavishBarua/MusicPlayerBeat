@@ -49,289 +49,866 @@
     </com.google.android.material.appbar.AppBarLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <!-- Preset -->
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+    <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:weightSum="10">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/textview_equalizer_preset"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="Preset:"
-                    tools:ignore="HardcodedText" />
+        <!--31 Hz-->
 
-            <Spinner
-                    android:id="@+id/spinner_equalizer_preset"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <!-- Band[0] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--62 Hz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_0"
-                    android:layout_width="0dp"
+                    android:id="@+id/e31hztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                    android:id="@+id/sb_thirty_one_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/e31hztxtHeader"
+                    android:layout_below="@+id/e31hztxt"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_use_thumb_to_set_progress="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e31hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:text="31 Hz"
-                    tools:text="31 Hz" />
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_0"
-                    android:layout_width="0dp"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[1] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_1"
-                    android:layout_width="0dp"
+                    android:id="@+id/e62hztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                 android:id="@+id/sb_sixty_two_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e62hztxt"
+                    android:layout_above="@+id/e62hztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e62hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:text="62 Hz"
-                    tools:text="62 Hz" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[2] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--125 Hz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_2"
-                    android:layout_width="0dp"
+                    android:id="@+id/e125hztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                   android:id="@+id/sb_one_twentyfive_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e125hztxt"
+                    android:layout_above="@+id/e125hztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e125hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:text="125 Hz"
-                    tools:text="125 Hz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[3] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--250 Hz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_3"
-                    android:layout_width="0dp"
+                    android:id="@+id/e250hztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="10"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                   android:id="@+id/sb_two_fifty_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e250hztxt"
+                    android:layout_above="@+id/e250hztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e250hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:text="250 Hz"
-                    tools:text="250 Hz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <!-- Band[4] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        </RelativeLayout>
+        
+        <!--500 Hz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_4"
-                    android:layout_width="0dp"
+                    android:id="@+id/e500hztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                   android:id="@+id/sb_five_hundred_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e500hztxt"
+                    android:layout_above="@+id/e500hztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e500hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:text="500 Hz"
-                    tools:text="500 Hz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[5] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--1 KHz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_5"
-                    android:layout_width="0dp"
+                    android:id="@+id/e1khztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="1 KHz"
-                    tools:text="1 KHz"
-                    />
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_5"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <!-- Band[6] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                    android:id="@+id/sb_one_kilo_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e1khztxt"
+                    android:layout_above="@+id/e1khztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_6"
-                    android:layout_width="0dp"
+                    android:id="@+id/e1khztxtHeader"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="2 KHz"
-                    tools:text="2 KHz"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="1KHz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_6"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[7] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--2 KHz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_7"
-                    android:layout_width="0dp"
+                    android:id="@+id/e2khztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="4 KHz"
-                    tools:text="4 KHz"
-                    />
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_7"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <!-- Band[8] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                    android:id="@+id/sb_two_kilo_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e2khztxt"
+                    android:layout_above="@+id/e2khztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_8"
-                    android:layout_width="0dp"
+                    android:id="@+id/e2khztxtHeader"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="8 KHz"
-                    tools:text="8 KHz"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="2KHz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_8"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
-        <!-- Band[9] -->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        <!--4 KHz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textview_equalizer_band_9"
-                    android:layout_width="0dp"
+                    android:id="@+id/e4khztxt"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:text="16 KHz"
-                    tools:text="16 KHz"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                  android:id="@+id/sb_four_kilo_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e4khztxt"
+                    android:layout_above="@+id/e4khztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e4khztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="4KHz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     />
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/seekbar_equalizer_band_9"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:max="31"
-                    android:progress="16"
-                    android:layout_weight="3" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
 
+        <!--8 KHz-->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/e8khztxt"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+        <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+             android:id="@+id/sb_eight_kilo_hz"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/e8khztxt"
+                android:layout_above="@+id/e8khztxtHeader"
+                android:layout_centerInParent="true"
+                app:vsb_bar_background="#eeeeee"
+                app:vsb_bar_corner_radius="15dp"
+                app:vsb_bar_progress_gradient_end="#4dd0e1"
+                app:vsb_bar_progress_gradient_start="#03a2ba"
+                app:vsb_bar_width="5dp"
+                app:vsb_click_to_set_progress="true"
+                app:vsb_max_placeholder_position="inside"
+                app:vsb_min_placeholder_position="inside"
+                app:vsb_show_thumb="true"
+                app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                app:vsb_thumb_container_corner_radius="5dp"
+                app:vsb_use_thumb_to_set_progress="true"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/e8khztxtHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="8kHz"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+    </RelativeLayout>
+
+        <!--16 KHz-->
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e16khztxt"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                 android:id="@+id/sb_sixteen_kilo_hz"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/e16khztxt"
+                    android:layout_above="@+id/e16khztxtHeader"
+                    android:layout_centerInParent="true"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_max_placeholder_position="inside"
+                    app:vsb_min_placeholder_position="inside"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e16khztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="16kHz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    />
+
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </HorizontalScrollView>
+
+    <!-- Preset -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/textview_equalizer_preset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="Preset:"
+                tools:ignore="HardcodedText" />
+
+        <Spinner
+                android:id="@+id/spinner_equalizer_preset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <!-- Band[0] -->
+<!--
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="31 Hz"
+                tools:text="31 Hz" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_0"
+                android:layout_width="0dp"
+                android:max="31"
+                android:progress="16"
+                android:layout_height="wrap_content"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[1] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="62 Hz"
+                tools:text="62 Hz" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[2] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="125 Hz"
+                tools:text="125 Hz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[3] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="250 Hz"
+                tools:text="250 Hz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[4] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="500 Hz"
+                tools:text="500 Hz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[5] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="1 KHz"
+                tools:text="1 KHz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[6] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="2 KHz"
+                tools:text="2 KHz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[7] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="4 KHz"
+                tools:text="4 KHz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[8] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="8 KHz"
+                tools:text="8 KHz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    &lt;!&ndash; Band[9] &ndash;&gt;
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textview_equalizer_band_9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="16 KHz"
+                tools:text="16 KHz"
+                />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar_equalizer_band_9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="31"
+                android:progress="16"
+                android:layout_weight="3" />
+    </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+   <!-- <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e1200hztxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:singleLine="true"
+                    android:text="0"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <com.tavish.musicplayerbeat.Utils.CustomViews.RangeBar.BeatRangeBarView
+                    android:id="@+id/seekbar_equalizer_band_20"
+                    android:layout_below="@+id/e1200hztxt"
+                    android:layout_above="@+id/e1200hztxtHeader"
+                    android:layout_width="160dp"
+                    android:layout_height="280dp"
+                    android:layout_gravity="center"
+                    app:vsb_bar_background="#eeeeee"
+                    app:vsb_bar_corner_radius="15dp"
+                    app:vsb_bar_progress_gradient_end="#4dd0e1"
+                    app:vsb_bar_progress_gradient_start="#03a2ba"
+                    app:vsb_bar_width="5dp"
+                    app:vsb_click_to_set_progress="true"
+                    app:vsb_show_thumb="true"
+                    app:vsb_thumb_container_corner_radius="5dp"
+                    app:vsb_thumb_placeholder_src="@drawable/thumb_placeholder"
+                    app:vsb_use_thumb_to_set_progress="true"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/e1200hztxtHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="31 Hz"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    />
+
+        </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>-->
 
     <!-- Virtualizer -->
+
+
 
     <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"

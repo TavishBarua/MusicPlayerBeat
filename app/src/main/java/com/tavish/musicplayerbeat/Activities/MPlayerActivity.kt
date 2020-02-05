@@ -1,27 +1,28 @@
 package com.tavish.musicplayerbeat.Activities
 
 import android.content.*
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.tavish.musicplayerbeat.Adapters.PlayerPagerAdapter
 import com.tavish.musicplayerbeat.Common
-import com.tavish.musicplayerbeat.Helpers.*
+import com.tavish.musicplayerbeat.Helpers.RequestPermissionHandler
+import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
+import com.tavish.musicplayerbeat.Helpers.SongManager
+import com.tavish.musicplayerbeat.Helpers.binder
 import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
@@ -29,13 +30,14 @@ import com.tavish.musicplayerbeat.Utils.Constants
 import com.yarolegovich.discretescrollview.DiscreteScrollView
 import com.yarolegovich.discretescrollview.InfiniteScrollAdapter
 import com.yarolegovich.discretescrollview.transform.ScaleTransformer
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_mplayer.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.android.asCoroutineDispatcher
-import java.lang.Runnable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
-class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
+class MPlayerActivity : AppCompatActivity(), View.OnClickListener{
 
 
     private var wrapper: InfiniteScrollAdapter<*>? = null
@@ -46,8 +48,10 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     private val rr_play_pause by binder<RelativeLayout>(R.id.ll_play_pause)
     private val btn_repeat by binder<ImageButton>(R.id.btn_repeat)
     private val btn_equalizer by binder<ImageButton>(R.id.btn_equalizer)
-    private val toolbar by binder<Toolbar>(R.id.toolbar)
+   // private val toolbar by binder<Toolbar>(R.id.toolbar)
     private lateinit var tv_tb_song_title: AppCompatTextView
+
+    private var mCompositeDisposable: CompositeDisposable? = null
 
 
     private val tv_current_duration by binder<TextView>(R.id.songCurrentDurationLabel)
@@ -57,9 +61,9 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     private val mSeekBar by binder<SeekBar>(R.id.seekBar1)
 
 
-    private val mToolBar by binder<Toolbar>(R.id.toolbar)
+   // private val mToolBar by binder<Toolbar>(R.id.toolbar)
 
-    private val mAppBarLayout by binder<AppBarLayout>(R.id.id_toolbar_container)
+   // private val mAppBarLayout by binder<AppBarLayout>(R.id.id_toolbar_container)
 
     //private val view_custom_toolbar by binder<View>(R.id.custom_toolbar)
     lateinit var readWriteSongPermissionHandler: RequestPermissionHandler
@@ -82,21 +86,34 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     // Application Context
     private var mApp: Common? = null
 
-
     private var mContext: Context? = null
     private var isUserScroll = true
     private var shuffleFlag: Int? = 0
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mplayer)
 
-        mFragments = mutableListOf()
-        mContext = applicationContext
+     /*   getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content, CurrentPlayingBottomBarFragment())
+                .commit()*/
 
-        tv_tb_song_title = toolbar.findViewById(R.id.tv_tb_song_title)
+       // mFragments = mutableListOf()
+        postponeEnterTransition()
+
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window?.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(
+                android.R.transition.move
+            )
+            window?.sharedElementEnterTransition?.duration=300
+        }*/
+        mFragments=mutableListOf()
+        mContext = applicationContext
+        mCompositeDisposable= CompositeDisposable()
+
+       // tv_tb_song_title = toolbar.findViewById(R.id.tv_tb_song_title)
+        tv_tb_song_title = findViewById(R.id.tv_tb_song_title)
         /* if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.SHUFFLE_MODE,Constants.SHUFFLE_OFF)==Constants.SHUFFLE_ON)
          shuffleFlag=1*/
         mApp = mContext as Common
@@ -123,10 +140,19 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
               }
           })*/
 
-        val params = mAppBarLayout.getLayoutParams() as RelativeLayout.LayoutParams
+        /*setSupportActionBar(mToolBar)
+        supportActionBar?.let {
+            it.setDisplayShowTitleEnabled(false)
+            it.setDisplayHomeAsUpEnabled(true)
+        }*/
+
+       // mToolBar.setNavigationOnClickListener {onBackPressed()}
+
+
+      /*  val params = mAppBarLayout.layoutParams as RelativeLayout.LayoutParams
         params.topMargin = Common.getStatusBarHeight(this)
         params.bottomMargin = 0
-        mAppBarLayout.layoutParams = params
+        mAppBarLayout.layoutParams = params*/
 
         rr_play_pause.setOnClickListener(this)
         btn_next.setOnClickListener(this)
@@ -135,7 +161,6 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         btn_equalizer.setOnClickListener(this)
 
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -303,6 +328,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                     //Bug Line
                     var newPos = mApp?.mService?.mSongPos
 
+                    mRecyclerViewPagerAdapter?.notifyDataSetChanged()
                     //  var currentPos = mViewPager?.currentItem
                     var currentPos = mSongViewer?.currentItem
                     if (currentPos != newPos) {
@@ -367,9 +393,10 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onResume() {
+     //   loadData()
+    //    initViewPager()
         super.onResume()
-
-
+        registerReceiver(mUpdateUIReceiver, IntentFilter(Constants.ACTION_UPDATE_NOW_PLAYING_UI))
         if (mApp?.isServiceRunning()!!) {
             if (mApp?.mService?.isMusicPlaying()!!) {
                 img_play_pause.setImageResource(R.drawable.pause)
@@ -386,6 +413,8 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         repeatButton()
         // shuffleButton()
     }
+
+
 
 
     var seekBarUpdateRunnable = object : Runnable {
@@ -519,12 +548,13 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initViewPager() {
         try {
+            var abcd  = intent?.extras?.getParcelableArrayList<SongDto>("data")
             //  mViewPager?.visibility = View.INVISIBLE
             mRecyclerViewPagerAdapter = PlayerPagerAdapter(this)
             mSongViewer?.apply {
                 mSongViewer?.adapter = mRecyclerViewPagerAdapter
                 setOffscreenItems(3)
-                setItemTransitionTimeMillis(70)
+                setItemTransitionTimeMillis(450)
                 setItemTransformer(ScaleTransformer.Builder().setMinScale(0.8f).build())
                 //  addScrollStateChangeListener(mPageChangeListener)
                 addOnItemChangedListener(mPageChangeListener)
@@ -545,6 +575,7 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
             //  LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, IntentFilter("song_dto"))
             var pos: Int? = 0
+
 
             if (mApp?.isServiceRunning()!!) {
                 mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
@@ -576,6 +607,17 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
 
     }
+
+    fun addFragment(fragment: Fragment) {
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.rr_mplayer, fragment).addToBackStack(null) // to be added frag parent layout
+        fragmentTransaction.commit()
+
+        mFragments?.add(fragment)
+    }
+
 
     /*  var mBroadcastReceiver= object: BroadcastReceiver() {
           override fun onReceive(context: Context?, intent: Intent?) {
@@ -622,6 +664,8 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
+
+
 
 
 }

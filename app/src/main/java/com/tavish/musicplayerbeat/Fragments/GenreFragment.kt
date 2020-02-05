@@ -16,11 +16,13 @@ import com.tavish.musicplayerbeat.Models.AlbumDto
 import com.tavish.musicplayerbeat.Models.GenreDto
 
 import com.tavish.musicplayerbeat.R
+import com.tavish.musicplayerbeat.Utils.MusicUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_genre.*
 import java.util.ArrayList
 
 class GenreFragment : Fragment() {
@@ -50,12 +52,12 @@ class GenreFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val numberColumns=Common.getNumberOfColumns
-        mView= inflater.inflate(R.layout.fragment_genre, container, false)
+        val numberColumns = Common.getNumberOfColumns
+        mView = inflater.inflate(R.layout.fragment_genre, container, false)
 
         mRecyclerView = mView.findViewById(R.id.rr_genres)
-        mRecyclerView.layoutManager= GridLayoutManager(mContext, numberColumns)
-        mRecyclerView.adapter=mGenreAdapter
+        mRecyclerView.layoutManager = GridLayoutManager(mContext, numberColumns)
+        mRecyclerView.adapter = mGenreAdapter
 
         return mView
     }
@@ -66,16 +68,18 @@ class GenreFragment : Fragment() {
         super.onResume()
     }
 
-    fun loadGenres(){
-        mCompositeDisposable?.add(Observable.fromCallable { mApp?.getDBAccessHelper()?.getAllGenre() }
+    fun loadGenres() {
+        mCompositeDisposable?.add(Observable.fromCallable {
+            mApp?.getDBAccessHelper()?.getAllGenre()
+        }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object: DisposableObserver<MutableList<GenreDto>>(){
+            .subscribeWith(object : DisposableObserver<MutableList<GenreDto>>() {
                 override fun onComplete() {
                 }
 
                 override fun onNext(data: MutableList<GenreDto>) {
-                    mGenres=data
+                    mGenres = data
                     mGenreAdapter.updateData(mGenres)
                     mGenreAdapter.notifyDataSetChanged()
                 }
@@ -86,10 +90,16 @@ class GenreFragment : Fragment() {
 
             })
         )
-
-
-
     }
+
+    fun removeFragment(){
+        MusicUtils.slideInFragmentAnimation(fl_frag_genre,activity!!, this)
+    }
+
+    fun addFragment(){
+        MusicUtils.slideOutFragmentAnimation(fl_frag_genre)
+    }
+
 
     fun IsAlbumsEmpty(albums: MutableList<AlbumDto>, pos: Int): Boolean? {
         if (albums.size == 0) {

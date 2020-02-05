@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".BeatMusicLibrary"></activity>
+        <activity android:name=".Activities.SearchActivity"></activity>
         <activity
                 android:name=".Activities.MPlayerActivity"
                 android:launchMode="singleTask"></activity>

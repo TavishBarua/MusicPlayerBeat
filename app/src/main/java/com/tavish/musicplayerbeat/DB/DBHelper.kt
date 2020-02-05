@@ -5,9 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Models.ArtistDto
 import com.tavish.musicplayerbeat.Models.GenreDto
 import com.tavish.musicplayerbeat.Models.SongDto
+import com.tavish.musicplayerbeat.Utils.Constants
 import com.tavish.musicplayerbeat.Utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -149,6 +151,48 @@ class DBHelper(context: Context) :
         }
         return genres
     }
+
+    fun searchArtists(name: String): MutableList<ArtistDto> {
+        var artistDto: MutableList<ArtistDto> = mutableListOf()
+        val query =
+            "SELECT * FROM " + ARTIST_TABLE + " WHERE " + ARTIST_NAME + " LIKE '%" + name + "%'"+" ORDER BY " + SharedPrefHelper.getInstance().getString(SharedPrefHelper.Key.ARTIST_SORT_ORDER, ARTIST_NAME)+SharedPrefHelper.getInstance().getString(SharedPrefHelper.Key.ARTIST_SORT_TYPE, Constants.ASCENDING)
+
+        val cursor: Cursor? = getDB()?.rawQuery(query, null)
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                val artist = ArtistDto(
+                    cursor.getLong(cursor.getColumnIndex(DBHelper.ARTIST_ID)),
+                    cursor.getString(cursor.getColumnIndex(DBHelper.ARTIST_NAME)),
+                    cursor.getString(cursor.getColumnIndex(DBHelper.ARTIST_ALBUM_ART)),
+                    cursor.getInt(cursor.getColumnIndex(DBHelper.NO_OF_TRACKS_BY_ARTIST)),
+                    cursor.getInt(cursor.getColumnIndex(DBHelper.NO_OF_ALBUMS_BY_ARTIST))
+                )
+                artistDto.add(artist)
+            } while (cursor.moveToNext())
+            cursor.close()
+        }
+        return artistDto
+
+    }
+
+    fun searchGenre(name: String): MutableList<GenreDto> {
+        val genres: MutableList<GenreDto> = mutableListOf()
+        val query =
+            "SELECT * FROM $GENRES_TABLE WHERE $GENRE_NAME LIKE '%$name%'"
+        val cursor = getDB()?.rawQuery(query,null)
+        if (cursor != null && cursor.moveToFirst()){
+            do {
+                val genre = GenreDto(cursor.getLong(cursor.getColumnIndex(GENRE_ID)),
+                    cursor.getString(cursor.getColumnIndex(GENRE_NAME)),
+                    cursor.getString(cursor.getColumnIndex(GENRE_ALBUM_ART)),
+                    cursor.getInt(cursor.getColumnIndex(NO_OF_ALBUMS_IN_GENRE)))
+                genres.add(genre)
+            }while (cursor.moveToNext())
+            cursor.close()
+        }
+        return genres
+    }
+
 
     fun insertSongCount(songDto: SongDto) {
         val values = ContentValues();
@@ -368,13 +412,13 @@ class DBHelper(context: Context) :
 
     fun getQueue(): MutableList<SongDto> {
 
-        if(songs.size <= 0){
-           songs= allsongs()
+        if (songs.size <= 0) {
+            songs = allsongs()
         }
         return songs
     }
 
-    fun allsongs(): MutableList<SongDto>{
+    fun allsongs(): MutableList<SongDto> {
         val cursor = getDB()?.rawQuery("SELECT * FROM $SONGS_TABLE", null)
         if (cursor?.moveToFirst()!!) {
             do {
@@ -433,7 +477,7 @@ class DBHelper(context: Context) :
     }
 
     fun getEQValues(): Array<Int?> {
-        val query = "SELECT * FROM " + EQ_TABLE + " WHERE "+ _ID+ " = 1"
+        val query = "SELECT * FROM " + EQ_TABLE + " WHERE " + _ID + " = 1"
         val cursor = getDB()?.rawQuery(query, null)
         val eqValues = arrayOfNulls<Int>(15)
         if (cursor != null && cursor.count != 0) {
@@ -493,7 +537,7 @@ class DBHelper(context: Context) :
     }
 
     fun updateEQValues(
-        command: String?, preset_name:String?, thirtyOneHz: Int?, sixtyTwoHz: Int?,
+        command: String?, preset_name: String?, thirtyOneHz: Int?, sixtyTwoHz: Int?,
         oneHunderedTwentyFiveHzLevel: Int?, twoHundredFiftyHz: Int?,
         fiveHundredHz: Int?, oneKHz: Int?,
         twoKHz: Int?, fourKHz: Int?,
@@ -503,7 +547,7 @@ class DBHelper(context: Context) :
     ) {
 
         val values = ContentValues()
-        values.put(PRESET_NAME,preset_name)
+        values.put(PRESET_NAME, preset_name)
         values.put(EQ_31_Hz, thirtyOneHz)
         values.put(EQ_62_Hz, sixtyTwoHz)
         values.put(EQ_125_Hz, oneHunderedTwentyFiveHzLevel)

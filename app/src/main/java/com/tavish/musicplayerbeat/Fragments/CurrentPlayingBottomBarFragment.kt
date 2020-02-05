@@ -4,14 +4,17 @@ import android.app.Activity
 import android.content.*
 import android.os.Bundle
 import android.os.Handler
+import android.transition.TransitionInflater
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSeekBar
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -19,15 +22,33 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tavish.musicplayerbeat.Adapters.CurrentPlayingBottomBarAdapter
 import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
+import com.tavish.musicplayerbeat.Interfaces.SharedResourceOnItemClickActivity
+import com.tavish.musicplayerbeat.Interfaces.SharedResourceOnItemClickFragment
 import com.tavish.musicplayerbeat.Models.SongDto
-
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
 import kotlinx.coroutines.*
 
-class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener {
 
-    val job = SupervisorJob()
+class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener, SharedResourceOnItemClickFragment {
+
+
+    companion object{
+        fun newInstance(context: Context?): CurrentPlayingBottomBarFragment {
+            val fragment = CurrentPlayingBottomBarFragment()
+            fragment.enterTransition = TransitionInflater.from(context).inflateTransition(
+                R.transition.slide_bottom
+            )
+            fragment.reenterTransition = TransitionInflater.from(context).inflateTransition(
+                R.transition.slide_left
+            )
+            fragment.exitTransition = TransitionInflater.from(context).inflateTransition(
+                R.transition.slide_left
+            )
+            return fragment
+        }
+    }
+
     /*override val coroutineContext: CoroutineContext
         get() */
     private var mView: View? = null
@@ -44,6 +65,11 @@ class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener {
     private var mActivity: Activity? = null
 
 
+    private var mSharedResourceOnItemClickActivity: SharedResourceOnItemClickActivity? = null
+
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,7 +82,8 @@ class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener {
 
         mRecyclerView?.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        mCurrentBottomBarAdapter = CurrentPlayingBottomBarAdapter(this)
+       mCurrentBottomBarAdapter = CurrentPlayingBottomBarAdapter(mApp?.getDBAccessHelper()?.getQueue()!!,this)
+       // mCurrentBottomBarAdapter = CurrentPlayingBottomBarAdapter(this)
         mRecyclerView?.adapter = mCurrentBottomBarAdapter
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(mRecyclerView)
@@ -104,6 +131,32 @@ class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener {
         return mView
     }
 
+
+
+
+    override fun onSongItemClickFragment(pos: Int, songItems: MutableList<SongDto>, shareImageView: ImageView) {
+        /*val songFragment = MPlayerFragment.newInstance(pos,songItem)
+        fragmentManager
+            ?.beginTransaction()
+            ?.addSharedElement(shareImageView, ViewCompat.getTransitionName(shareImageView)!!)
+            ?.addToBackStack(CurrentPlayingBottomBarFragment::class.java.simpleName)
+            ?.replace(R.id.rl_main, songFragment)
+            ?.commit()*/
+
+        mSharedResourceOnItemClickActivity?.onSongItemClickActivity(pos,songItems,shareImageView)
+       /* val intent = Intent(context,MPlayerFragment::class.java)
+        val pair = androidx.core.util.Pair<View,String>(shareImageView, ViewCompat.getTransitionName(shareImageView)!!)
+        val pair1 = androidx.core.util.Pair<Int,String>(pos, ViewCompat.getTransitionName(shareImageView)!!)
+        val pair2 = androidx.core.util.Pair<SongDto,String>(songItem, ViewCompat.getTransitionName(shareImageView)!!)
+        val options =
+            ActivityOptionsCompat.makeSceneTransitionAnimation(context as Activity, pair)
+        intent.putExtra("data",songItem)
+        startActivity(intent,options.toBundle())*/
+
+    }
+
+
+
     override fun onResume() {
         super.onResume()
         updateUI()
@@ -112,6 +165,7 @@ class CurrentPlayingBottomBarFragment : Fragment(), View.OnClickListener {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         mActivity = context as Activity
+        mSharedResourceOnItemClickActivity = mActivity as SharedResourceOnItemClickActivity
 
     }
 
