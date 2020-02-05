@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.appcompat.widget.LinearLayoutCompat
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/placeholder_song_cardview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#66000000"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="0.75"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/opensanslight"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="Song Name"
+                    android:textColor="#05050F"
+                    android:textSize="18sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txt_artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/opensanslight"
+                    android:layout_marginBottom="5dp"
+                    android:singleLine="true"
+                    android:text="Artist Name"
+                    android:textColor="#05050F"
+                    android:textSize="14sp" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+                android:id="@+id/txt_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.25"
+                android:fontFamily="@font/opensanslight"
+                android:gravity="center"
+                android:text="00:00"
+                android:textColor="#05050F"
+                android:textSize="14sp" />
+
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>

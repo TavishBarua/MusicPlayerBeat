@@ -1,36 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rl_main"
+        android:background="@color/velvet_white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         tools:context=".Activities.MainActivity">
+<!--       android:background="@drawable/bg_tablayout"-->
 
-    <com.google.android.material.appbar.AppBarLayout
+
+
+       <!-- <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/bg_tablayout"
+                android:contentInsetStart="0dp"
+                android:contentInsetLeft="0dp"
+                android:contentInsetEnd="0dp"
+                android:contentInsetRight="0dp"
+                app:contentInsetEnd="0dp"
+                app:contentInsetLeft="0dp"
+                app:contentInsetRight="0dp"
+                app:contentInsetStart="0dp"
+                app:popupTheme="@style/Theme.AppCompat.Light.NoActionBar">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:orientation="horizontal">
+
+                    <ImageButton
+                            android:id="@+id/btn_search"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:src="@drawable/btn_search" />
+
+
+                </LinearLayout>
+
+
+                <com.tavish.musicplayerbeat.Utils.CustomViews.BeatTabView.BeatCustomTabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:tabMode="scrollable"
+                        android:background="?selectableItemBackground"
+                        app:tabSelectedTextColor="@color/velvet_white">
+
+
+                </com.tavish.musicplayerbeat.Utils.CustomViews.BeatTabView.BeatCustomTabLayout>
+
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Shuffle Songs"
+                        android:textSize="12sp"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/velvet_white"
+                        android:fontFamily="@font/opensanslight"
+                        android:background="?selectableItemBackground"
+                        />
+            </LinearLayout>
+
+
+        </androidx.appcompat.widget.Toolbar>-->
+
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/smooth_violet"
-            android:elevation="0dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:id="@+id/appBarLayout">
+            android:background="?selectableItemBackground"
+            android:id="@+id/rr_search_bar"
+            android:layout_marginTop="10dp">
 
-        <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs"
+        <LinearLayout
+                android:weightSum="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                    android:src="@drawable/btn_menu_black"
+                    android:layout_weight="0.3"
+                    android:background="?selectableItemBackground"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:gravity="center"
+                    android:layout_weight="2.4"
+                    android:textSize="24sp"
+                    android:text="BeatDrop"
+                    android:fontFamily="@font/opensansregular"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_main_search"
+                android:layout_weight="0.3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/btn_search_black"
+                android:background="?selectableItemBackground"
+                />
+
+
+
+
+        </LinearLayout>
+
+       <!-- <com.mancj.materialsearchbar.MaterialSearchBar
+                style="@style/MaterialSearchBarLight"
+                app:mt_speechMode="true"
+                app:mt_hint="Custom hint"
+                app:mt_maxSuggestionsCount="10"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabTextColor="#fff"
-                app:tabSelectedTextColor="#eeeff1"
-                app:tabMode="scrollable"/>
+                android:id="@+id/searchBar" />-->
+       <!-- <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edit_text_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/colorPrimaryDark" />-->
 
-    </com.google.android.material.appbar.AppBarLayout>
+    </RelativeLayout>
 
-    <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewpager"
+
+
+
+    <RelativeLayout
+            android:id="@+id/main_content"
+            android:layout_below="@+id/rr_search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        <LinearLayout
+                android:id="@+id/ll_genres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp"
+                >
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_frag"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/ll_songs"
+                android:layout_marginTop="25dp"
+                android:orientation="vertical"
+                android:layout_below="@+id/ll_genres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_frag_song"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <!--<RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            />
+            android:layout_below="@+id/toolbar">
 
-</LinearLayout>
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="20dp"
+                android:background="@color/velvet_white">
+
+            <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/velvet_white"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:layout_below="@+id/toolbar">
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="20dp"
+                android:background="@color/velvet_white">
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rr_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/velvet_white"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    tools:listitem="@layout/placeholder_song_item"/>
+
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>-->
+
+  <!--  <RelativeLayout
+            android:id="@+id/container"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>-->
+
+    <fragment
+            android:id="@+id/bottom_bar"
+            android:name="com.tavish.musicplayerbeat.Fragments.CurrentPlayingBottomBarFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            tools:layout="@layout/fragment_current_playing_bottom_bar" />
+
+
+</RelativeLayout>

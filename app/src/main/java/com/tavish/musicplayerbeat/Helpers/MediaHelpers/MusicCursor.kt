@@ -1,8 +1,6 @@
 package com.tavish.musicplayerbeat.Helpers.MediaHelpers
 
 import android.content.ContentValues
-import android.content.Context
-import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
 import android.preference.PreferenceManager
@@ -12,7 +10,6 @@ import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.DB.DBHelper
 import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Models.AlbumDto
-import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.Utils.Logger
 import com.tavish.musicplayerbeat.Utils.MusicUtils
@@ -21,13 +18,14 @@ import java.io.File
 object MusicCursor {
 
 
-    fun buildMusicLibrary(): Boolean{
+    fun buildMusicLibrary(): Boolean {
 
-        val common=Common.getInstance() as Common
-        if (!shouldScan()){
+        val common = Common.getInstance() as Common
+        if (!shouldScan()) {
             return false
         }
         try {
+            saveEQPresets(common)
             val query =
                 "_id in (select genre_id from audio_genres_map where audio_id in (select _id from audio_meta where is_music != 0))"
 
@@ -35,7 +33,7 @@ object MusicCursor {
 
             val columns = arrayOf(MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME)
 
-            val cursor = Common.getInstance()?.contentResolver?.query (
+            val cursor = Common.getInstance()?.contentResolver?.query(
                 MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
                 columns,
                 query,
@@ -43,8 +41,12 @@ object MusicCursor {
                 MediaStore.Audio.Genres.NAME
             )
             try {
-                common.getDBAccessHelper().writableDatabase.delete(DBHelper.GENRES_TABLE,null,null)
-                if (cursor!=null&&cursor.moveToNext()){
+                common.getDBAccessHelper().writableDatabase.delete(
+                    DBHelper.GENRES_TABLE,
+                    null,
+                    null
+                )
+                if (cursor != null && cursor.moveToNext()) {
                     do {
                         val genre = ContentValues()
                         genre.put(DBHelper.GENRE_ID, cursor.getString(0))
@@ -56,12 +58,16 @@ object MusicCursor {
                                 DBHelper.GENRE_ALBUM_ART,
                                 MusicUtils.getAlbumArtUri(albums.get(0)._id!!).toString()
                             )
-                           // genre.put(DBHelper.NO_OF_ALBUMS_IN_GENRE, "" + albums.size)
+                            // genre.put(DBHelper.NO_OF_ALBUMS_IN_GENRE, "" + albums.size)
                             genre.put(DBHelper.NO_OF_ALBUMS_IN_GENRE, "${albums.size}")
                         }
-                        common.getDBAccessHelper().writableDatabase.insert(DBHelper.GENRES_TABLE,null, genre)
+                        common.getDBAccessHelper().writableDatabase.insert(
+                            DBHelper.GENRES_TABLE,
+                            null,
+                            genre
+                        )
 
-                    }while (cursor.moveToNext());
+                    } while (cursor.moveToNext());
                 }
 
                 val artistCols = arrayOf(
@@ -77,82 +83,126 @@ object MusicCursor {
                     null, null,
                     MediaStore.Audio.Artists.DEFAULT_SORT_ORDER
                 )
-                common.getDBAccessHelper().writableDatabase.delete(DBHelper.ARTIST_TABLE, null, null)
+                common.getDBAccessHelper().writableDatabase.delete(
+                    DBHelper.ARTIST_TABLE,
+                    null,
+                    null
+                )
 
-                if (artistCursor !=null && artistCursor.moveToFirst()){
+                if (artistCursor != null && artistCursor.moveToFirst()) {
 
-                 //   val path = File(Common.getInstance().get()?.cacheDir, "artistThumbnails").getAbsolutePath() + "/"
-                  val path = "${File(Common.getInstance()?.cacheDir, "artistThumbnails").getAbsolutePath()} /"
-                  do {
-                    val artist=ContentValues()
-                    artist.put(DBHelper.ARTIST_ID, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
-                    artist.put(DBHelper.ARTIST_NAME, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST)))
-                    artist.put(DBHelper.NO_OF_TRACKS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)))
-                    artist.put(DBHelper.NO_OF_ALBUMS_BY_ARTIST, artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS)))
+                    //   val path = File(Common.getInstance().get()?.cacheDir, "artistThumbnails").getAbsolutePath() + "/"
+                    val path = "${File(
+                        Common.getInstance()?.cacheDir,
+                        "artistThumbnails"
+                    ).getAbsolutePath()} /"
+                    do {
+                        val artist = ContentValues()
+                        artist.put(
+                            DBHelper.ARTIST_ID,
+                            artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID))
+                        )
+                        artist.put(
+                            DBHelper.ARTIST_NAME,
+                            artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST))
+                        )
+                        artist.put(
+                            DBHelper.NO_OF_TRACKS_BY_ARTIST,
+                            artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS))
+                        )
+                        artist.put(
+                            DBHelper.NO_OF_ALBUMS_BY_ARTIST,
+                            artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS))
+                        )
 
-                      val albums = getAlbumsSelection(
-                          "ARTISTS",
-                          artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID))
-                      )
-                    if (albums!=null && albums.size>0){
-                        val cacheFile =
-                            File(path + artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID)))
+                        val albums = getAlbumsSelection(
+                            "ARTISTS",
+                            artistCursor.getString(artistCursor.getColumnIndex(MediaStore.Audio.Artists._ID))
+                        )
+                        if (albums != null && albums.size > 0) {
+                            val cacheFile =
+                                File(
+                                    path + artistCursor.getString(
+                                        artistCursor.getColumnIndex(
+                                            MediaStore.Audio.Artists._ID
+                                        )
+                                    )
+                                )
                             if (cacheFile.exists())
-                                artist.put(DBHelper.ARTIST_ALBUM_ART,"file:\\ ${cacheFile.absolutePath}")
+                                artist.put(
+                                    DBHelper.ARTIST_ALBUM_ART,
+                                    "file:\\ ${cacheFile.absolutePath}"
+                                )
                             else
-                                artist.put(DBHelper.ARTIST_ALBUM_ART,"${MusicUtils.getAlbumArtUri(albums.get(0)._id!!)}")
-                    }
-                    common.getDBAccessHelper().writableDatabase.insert(DBHelper.ARTIST_TABLE,null, artist)
+                                artist.put(
+                                    DBHelper.ARTIST_ALBUM_ART,
+                                    "${MusicUtils.getAlbumArtUri(albums.get(0)._id!!)}"
+                                )
+                        }
+                        common.getDBAccessHelper().writableDatabase.insert(
+                            DBHelper.ARTIST_TABLE,
+                            null,
+                            artist
+                        )
 
 
-                  }while (artistCursor.moveToNext());
+                    } while (artistCursor.moveToNext());
 
-                        artistCursor.close()
+                    artistCursor.close()
                 }
 
 
-            }catch (ex:Exception){
+            } catch (ex: Exception) {
                 ex.printStackTrace()
                 Logger.log("ERROR CAUSE ${ex.cause}")
-            }finally {
+            } finally {
                 common.getDBAccessHelper().writableDatabase.setTransactionSuccessful()
                 common.getDBAccessHelper().writableDatabase.endTransaction()
-                SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.FIRST_LAUNCH,false)
+                SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.FIRST_LAUNCH, false)
             }
 
-           // cursor?.close()
+            // cursor?.close()
 
             return true
 
 
-        }catch (ex:Exception){
+        } catch (ex: Exception) {
             ex.printStackTrace()
             return false
         }
 
     }
 
-    fun getAlbumsList():MutableList<AlbumDto>{
-           // val sort= SharedPrefHelper
-            val columns= arrayOf(MediaStore.Audio.Albums._ID,
-                                MediaStore.Audio.Albums.ALBUM,
-                                MediaStore.Audio.Albums.ARTIST,
-                                MediaStore.Audio.Albums.ALBUM_ART)
-        val cursor=Common.getInstance()?.contentResolver?.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+    fun getAlbumsList(): MutableList<AlbumDto> {
+        // val sort= SharedPrefHelper
+        val columns = arrayOf(
+            MediaStore.Audio.Albums._ID,
+            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.Albums.ARTIST,
+            MediaStore.Audio.Albums.ALBUM_ART
+        )
+        val cursor = Common.getInstance()?.contentResolver?.query(
+            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
             columns,
             null,
             null,
-            null)
+            null
+        )
 
-        val albums= mutableListOf<AlbumDto>()
+        val albums = mutableListOf<AlbumDto>()
 
-        if (cursor !=null && cursor.moveToNext()){
+        if (cursor != null && cursor.moveToNext()) {
             do run {
-                val album = AlbumDto(cursor.getLong(0), cursor.getString(1), cursor.getString(2), cursor.getString(3))
+                val album = AlbumDto(
+                    cursor.getLong(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)
+                )
                 albums.add(album)
             } while (cursor.moveToNext())
         }
-        if(cursor!=null){
+        if (cursor != null) {
             cursor.close()
         }
 
@@ -160,28 +210,73 @@ object MusicCursor {
 
     }
 
+
+    fun getMenuImages(): MutableList<AlbumDto> {
+        // val sort= SharedPrefHelper
+        val columns = arrayOf(
+            MediaStore.Audio.Albums._ID,
+            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.Albums.ARTIST,
+            MediaStore.Audio.Albums.ALBUM_ART
+        )
+        val cursor = Common.getInstance()?.contentResolver?.query(
+            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+            columns,
+            null,
+            null,
+            BaseColumns._ID + " DESC " + " LIMIT 5"
+        )
+
+        val albums = mutableListOf<AlbumDto>()
+
+        if (cursor != null && cursor.moveToNext()) {
+            do run {
+                val album = AlbumDto(
+                    cursor.getLong(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)
+                )
+                albums.add(album)
+            } while (cursor.moveToNext())
+        }
+        if (cursor != null) {
+            cursor.close()
+        }
+
+        return albums
+
+    }
+
+
     private fun shouldScan(): Boolean {
-        if (SharedPrefHelper.getInstance().getBoolean(SharedPrefHelper.Key.FIRST_LAUNCH,true)!!)
+        if (SharedPrefHelper.getInstance().getBoolean(SharedPrefHelper.Key.FIRST_LAUNCH, true)!!)
             return true
-        else{
-            val sharedPreferences=PreferenceManager.getDefaultSharedPreferences(Common.getInstance())
-            val scanAt =Integer.parseInt(sharedPreferences.getString("preference_key_scan_frequency", "5")!!)
-            val launchCount = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.LAUNCH_COUNT)
-            if (scanAt==5){
+        else {
+            val sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(Common.getInstance())
+            val scanAt = Integer.parseInt(
+                sharedPreferences.getString(
+                    "preference_key_scan_frequency",
+                    "5"
+                )!!
+            )
+            val launchCount =
+                SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.LAUNCH_COUNT)
+            if (scanAt == 5) {
                 return false
-            }else if(scanAt==0){
+            } else if (scanAt == 0) {
                 return true
-            }else if (scanAt==launchCount){
-                SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.LAUNCH_COUNT,0)
+            } else if (scanAt == launchCount) {
+                SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.LAUNCH_COUNT, 0)
                 return true
-            }else
+            } else
                 return false
         }
     }
 
 
-
-    fun getSongsSelection(from: String, condition:String):MutableList<SongDto>{
+    fun getSongsSelection(from: String, condition: String): MutableList<SongDto> {
 
         val columns = arrayOf(
             BaseColumns._ID,
@@ -197,19 +292,34 @@ object MusicCursor {
         )
 
         var selection: String? = null
-        var uri: Uri? = null
+        var uri: Uri? = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         var selectionArgs: Array<String>? = null
-        var sortBy: String? = null
+        var sortOrder: String? = MediaStore.Audio.Media.DEFAULT_SORT_ORDER
 
-        val songDtoList:MutableList<SongDto> = mutableListOf()
+        val songDtoList: MutableList<SongDto> = mutableListOf()
 
-        if (from.equals("SONGS", ignoreCase = true)) run{
-            selection= "is_music=1 AND title != ''";
-            uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        if (from.equals("SONGS", ignoreCase = true)){
+            selection = "is_music=1 AND title != ''";
+            // uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
+        } else if (from.equals("ARTISTS", ignoreCase = true)) {
+            selection = "is_music=1 AND title != '' AND " + MediaStore.Audio.Media.ARTIST_ID + "=?"
+            //  uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            selectionArgs = arrayOf(condition)
+           // sortBy = MediaStore.Audio.Media.DEFAULT_SORT_ORDER
+        }else if (from.equals("ALBUMS", ignoreCase = true)){
+            selection = "is_music=1 AND title != '' AND " + MediaStore.Audio.Media.ALBUM_ID + "=?"
+            selectionArgs = arrayOf(condition)
+        }else if (from.equals("GENRES",true)){
+            uri = MediaStore.Audio.Genres.Members.getContentUri(
+                "external",
+                condition.toLong()
+            )
         }
 
-        val songCursor: Cursor? = Common.getInstance()?.contentResolver?.query(uri!!,columns,selection,null,null)
+
+        val songCursor: Cursor? =
+            Common.getInstance()?.contentResolver?.query(uri!!, columns, selection, selectionArgs, sortOrder)
 
         val audioIndex = songCursor?.getColumnIndex(MediaStore.Audio.Media._ID)
 
@@ -236,31 +346,31 @@ object MusicCursor {
     }
 
 
-    fun getAlbumsSelection(from: String, condition:String):MutableList<AlbumDto>{
+    fun getAlbumsSelection(from: String, condition: String): MutableList<AlbumDto> {
 
         var selection: String? = null
         var uri: Uri? = null
         var selectionArgs: Array<String>? = null
         var sortBy: String? = null
 
-        if (from.equals("GENRES", ignoreCase = true)) run {
+        if (from.equals("GENRES", ignoreCase = true)){
             uri = MediaStore.Audio.Albums.getContentUri("external")
             selection = ("album_info._id IN "
                     + "(SELECT (audio_meta.album_id) album_id FROM audio_meta, audio_genres_map "
                     + "WHERE audio_genres_map.audio_id=audio_meta._id AND audio_genres_map.genre_id=?)")
             selectionArgs = arrayOf(condition)
             sortBy = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
-        }else if (from.equals("ALBUMS", ignoreCase = true)) run {
+        } else if (from.equals("ALBUMS", ignoreCase = true)) run {
             selection = "is_music=1 AND title != '' AND " + MediaStore.Audio.Media.ALBUM_ID + "=?"
             uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
             selectionArgs = arrayOf(condition)
             sortBy = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
-        }else if(from.equals("ARTISTS", ignoreCase = true)) run {
-            uri=MediaStore.Audio.Artists.Albums.getContentUri("external", condition.toLong())
-            sortBy=MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
+        } else if (from.equals("ARTISTS", ignoreCase = true)) run {
+            uri = MediaStore.Audio.Artists.Albums.getContentUri("external", condition.toLong())
+            sortBy = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER
         }
 
-        var albums:MutableList<AlbumDto> = mutableListOf()
+        var albums: MutableList<AlbumDto> = mutableListOf()
 
         val columns = arrayOf(
             BaseColumns._ID,
@@ -278,7 +388,12 @@ object MusicCursor {
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                val album = AlbumDto(cursor.getLong(0), cursor.getString(1), cursor.getString(2), cursor.getString(3))
+                val album = AlbumDto(
+                    cursor.getLong(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)
+                )
                 albums.add(album)
             } while (cursor.moveToNext())
 
@@ -287,5 +402,320 @@ object MusicCursor {
         return albums
 
     }
+
+    fun saveEQPresets(mApp: Common?) {
+
+        val eqPreset = mApp?.getDBAccessHelper()?.getEQPresets()
+        if (eqPreset != null && eqPreset.count == 0) {
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Reserved",
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Flat",
+                16,
+                16,
+                16,
+                16,
+                16,
+                16,
+                16,
+                16,
+                16,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Bass Only",
+                31,
+                31,
+                31,
+                31,
+                16,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Treble Only",
+                0,
+                0,
+                0,
+                0,
+                0,
+                16,
+                31,
+                31,
+                31,
+                31,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Rock",
+                16,
+                18,
+                16,
+                17,
+                19,
+                20,
+                22,
+                17,
+                16,
+                18,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Grunge",
+                13,
+                16,
+                18,
+                19,
+                20,
+                17,
+                13,
+                19,
+                18,
+                13,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Metal",
+                12,
+                16,
+                16,
+                16,
+                20,
+                24,
+                16,
+                16,
+                16,
+                12,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Dance",
+                14,
+                18,
+                20,
+                17,
+                16,
+                20,
+                23,
+                20,
+                18,
+                14,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Country",
+                16,
+                16,
+                18,
+                20,
+                17,
+                19,
+                20,
+                18,
+                16,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Jazz",
+                16,
+                16,
+                18,
+                18,
+                18,
+                16,
+                20,
+                18,
+                16,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Speech",
+                14,
+                16,
+                17,
+                14,
+                13,
+                15,
+                16,
+                17,
+                16,
+                14,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Classical",
+                16,
+                18,
+                18,
+                16,
+                16,
+                17,
+                18,
+                18,
+                18,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Blues",
+                16,
+                18,
+                19,
+                20,
+                17,
+                18,
+                16,
+                19,
+                18,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Opera",
+                16,
+                17,
+                19,
+                20,
+                16,
+                24,
+                18,
+                19,
+                17,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Swing",
+                15,
+                16,
+                18,
+                20,
+                18,
+                17,
+                16,
+                18,
+                16,
+                15,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "Acoustic",
+                17,
+                18,
+                16,
+                19,
+                17,
+                17,
+                14,
+                16,
+                18,
+                17,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+            mApp.getDBAccessHelper().updateEQValues(
+                "ADD",
+                "New Age",
+                16,
+                19,
+                15,
+                18,
+                16,
+                16,
+                18,
+                15,
+                19,
+                16,
+                0.toShort(),
+                0.toShort(),
+                0.toShort(),
+                0.toFloat()
+            )
+        }
+
+    }
+
 
 }

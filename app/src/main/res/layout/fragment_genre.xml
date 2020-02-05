@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.ContentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context=".Fragments.GenreFragment">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fl_frag_genre"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/velvet_white"
+        tools:context=".Fragments.GenreFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rr_genres"
+
+    <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-    </androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/opensanslight"
+                android:gravity="center"
+                android:text="GENRE"
+                android:textSize="24sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rr_genres"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.ContentFrameLayout>

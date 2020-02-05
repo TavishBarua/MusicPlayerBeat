@@ -1,83 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/placeholder_album_cardview"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         app:cardCornerRadius="2dp">
 
-    <FrameLayout android:layout_width="wrap_content"
-                 android:layout_height="wrap_content">
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
 
         <RelativeLayout
                 android:id="@+id/gridAlbumItemLayout"
                 android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/grid_Img_Album"
+                    android:id="@+id/img_grid_Album"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
-                    android:src="@mipmap/ic_launcher_round"
-            />
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/ic_launcher_round" />
 
 
-        <RelativeLayout
-                android:id="@+id/linear_layout_footer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/grid_Img_Album"
-                android:paddingBottom="8dp"
-                android:paddingLeft="8dp"
-                android:paddingTop="8dp">
-
-            <TextView
-                    android:id="@+id/gridViewTitleText"
+            <RelativeLayout
+                    android:id="@+id/linear_layout_footer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/overflow"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:text="Title Text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:layout_below="@+id/img_grid_Album"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
 
-            <TextView
-                    android:id="@+id/gridViewSubText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/gridViewTitleText"
-                    android:layout_toLeftOf="@id/overflow"
-                    android:ellipsize="marquee"
-                    android:singleLine="true"
-                    android:text="Subtext"
-                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                        android:id="@+id/tv_grid_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/overflow"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text="Title Text"
+                        android:fontFamily="@font/opensansregular"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <ImageView
-                    android:id="@+id/overflow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:ellipsize="end"
-                    android:padding="5dp"
-                    android:scaleX="0.8"
-                    android:scaleY="0.8"
-                    app:srcCompat="@drawable/drawable_overflow" />
+                <TextView
+                        android:id="@+id/tv_grid_sub_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tv_grid_title"
+                        android:layout_toLeftOf="@id/overflow"
+                        android:ellipsize="marquee"
+                        android:singleLine="true"
+                        android:text="Subtext"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <ImageView
+                        android:id="@+id/overflow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8"
+                        app:srcCompat="@drawable/drawable_overflow" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
-
-        </RelativeLayout>
-
 
 
     </FrameLayout>
-
-
 
 
 </androidx.cardview.widget.CardView>

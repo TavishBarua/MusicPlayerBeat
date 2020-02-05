@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso
 import com.tavish.musicplayerbeat.Activities.MainActivity
 import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Fragments.GenreFragment
+import com.tavish.musicplayerbeat.Fragments.TrackCardSubFragment
 import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicCursor
 import com.tavish.musicplayerbeat.Models.GenreDto
 import com.tavish.musicplayerbeat.R
@@ -20,7 +21,7 @@ import com.tavish.musicplayerbeat.Utils.Constants
 import com.tavish.musicplayerbeat.Utils.MusicUtils
 import kotlinx.android.synthetic.main.placeholder_grid_item.view.*
 
-class GenreAdapter(genreFragment: GenreFragment): RecyclerView.Adapter<GenreAdapter.GenreViewHolder>(), View.OnClickListener {
+class GenreAdapter(genreFragment: GenreFragment): RecyclerView.Adapter<GenreAdapter.GenreViewHolder>(){
 
 
     private var genreList: MutableList<GenreDto>? = null
@@ -55,38 +56,32 @@ class GenreAdapter(genreFragment: GenreFragment): RecyclerView.Adapter<GenreAdap
 
     }
 
-    override fun onClick(v: View?) {
 
-        /*if(v?.id==R.id.overflow){
-            mAlbumFragment
-        }*/
-    }
-
-    inner class GenreViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!), AdapterView.OnItemClickListener {
+    inner class GenreViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!),View.OnClickListener{
 
         fun bindItems(item: GenreDto) {
-            itemView.gridViewTitleText.text=item._genreName
-            itemView.gridViewSubText.text=item._noOfAlbumsInGenre.toString()
+            itemView.tv_grid_title.text=item._genreName
+            itemView.tv_grid_sub_title.text=item._noOfAlbumsInGenre.toString()
 
-            val params = itemView.grid_Img_Album.layoutParams as RelativeLayout.LayoutParams
+            val params = itemView.img_grid_Album.layoutParams as RelativeLayout.LayoutParams
             params.width = mWidth
             params.height = mWidth
-            itemView.grid_Img_Album.layoutParams = params
+            itemView.img_grid_Album.layoutParams = params
 
             Picasso.get()
-                .load(MusicUtils.getAlbumArtUri(genreList?.get(position)?._genreId!!).toString())
+                .load(genreList?.get(adapterPosition)?._genreAlbumArt)
                 .fit()
                 .centerCrop()
                 .placeholder(R.mipmap.icn_beatdrop)
-                .into(itemView.grid_Img_Album)
+                .into(itemView.img_grid_Album)
 
+            itemView.setOnClickListener(this)
             //  val iv_song_img by lazy<TextView?> { itemView?.findViewById(R.id.img_song) }
         }
 
 
 
-        @Suppress("NAME_SHADOWING")
-        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        override fun onClick(view: View?) {
             val id:Int=view!!.id
             when(id){
                 R.id.placeholder_album_cardview->{
@@ -99,16 +94,16 @@ class GenreAdapter(genreFragment: GenreFragment): RecyclerView.Adapter<GenreAdap
                 return
 
             val bundle= Bundle()
-            bundle.putString(Constants.HEADER_TITLE,genreList?.get(adapterPosition)?._genreName)
-            genreList?.get(adapterPosition)?._noOfAlbumsInGenre?.let { bundle.putInt(Constants.HEADER_SUB_TITLE, it) }
+            bundle.putString(Constants.TRACK_HEADER_TITLE,genreList?.get(adapterPosition)?._genreName)
+            genreList?.get(adapterPosition)?._noOfAlbumsInGenre?.let { bundle.putInt(Constants.TRACK_HEADER_SUB_TITLE, it) }
             bundle.putString(Constants.FROM_WHERE,"GENRES")
             genreList?.get(adapterPosition)?._genreAlbumArt?.let { bundle.putString(Constants.COVER_PATH, it) }
             bundle.putLong(Constants.SELECTION_VALUE,genreList?.get(adapterPosition)?._genreId!!)
 
-
-
+            val trackCardSubFragment = TrackCardSubFragment()
+            trackCardSubFragment.arguments = bundle
+            (mGenreFragment.activity as MainActivity).addFragment(trackCardSubFragment)
         }
-
 
 
     }

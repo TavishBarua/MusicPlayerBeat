@@ -2,6 +2,7 @@ package com.tavish.musicplayerbeat.Models
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.versionedparcelable.ParcelField
 import com.tavish.musicplayerbeat.Utils.MParcelable
 
 class SongDto(
@@ -33,9 +34,9 @@ class SongDto(
         dest.writeString(_title)
         dest.writeString(_album)
         dest.writeValue(_albumId)
-        dest.writeValue(_artist)
+        dest.writeString(_artist)
         dest.writeValue(_artistId)
-        dest.writeValue(_path)
+        dest.writeString(_path)
         dest.writeValue(_trackNumber)
         dest.writeValue(_duration)
     }

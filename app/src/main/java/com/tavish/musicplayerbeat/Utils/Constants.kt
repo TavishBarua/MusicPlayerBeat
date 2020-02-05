@@ -12,6 +12,8 @@ class Constants{
 
 
 
+
+
      const val UAMP_BROWSABLE_ROOT = "/"
      const val UAMP_EMPTY_ROOT = "@empty@"
      const val UAMP_RECOMMENDED_ROOT = "__RECOMMENDED__"
@@ -21,6 +23,9 @@ class Constants{
      const val SMALL_TABLET = "small_tablet"
      const val LARGE_TABLET = "large_tablet"
      const val XLARGE_TABLET = "xlarge_tablet"
+
+      //const val SHUFFLE_OFF = 0
+
 
         //Device orientation constants.
       const val ORIENTATION_PORTRAIT = 0
@@ -46,8 +51,8 @@ class Constants{
       const val PLAY_PAUSE_SONG_FROM_BOTTOM_BAR = 238
       const val PICK_FROM_GALLERY = 239
 
-      const val HEADER_TITLE = "HEADER_TITLE"
-      const val HEADER_SUB_TITLE = "HEADER_SUB_TITLE"
+      const val TRACK_HEADER_TITLE = "HEADER_TITLE"
+      const val TRACK_HEADER_SUB_TITLE = "HEADER_SUB_TITLE"
       const val FROM_WHERE = "FROM_WHERE"
       const val SELECTION_VALUE = "SELECTION_VALUE"
 
@@ -58,11 +63,15 @@ class Constants{
 
         const val UPDATE_UI = "UPDATE_UI"
 
+        const val DESCENDING = " DESC"
+        const val ASCENDING = " ASC"
+
         //Repeat mode constants.
         const val REPEAT_OFF = 0
         const val REPEAT_PLAYLIST = 1
         const val REPEAT_SONG = 2
-        const val A_B_REPEAT = 3
+        const val SHUFFLE_ON = 3
+        //const val A_B_REPEAT = 3
 
         const val JUST_UPDATE_UI = "JUST_UPDATE_UI"
 

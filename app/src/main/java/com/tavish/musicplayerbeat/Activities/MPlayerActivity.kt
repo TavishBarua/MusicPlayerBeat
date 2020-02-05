@@ -1,95 +1,121 @@
 package com.tavish.musicplayerbeat.Activities
 
 import android.content.*
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
 import com.google.android.material.appbar.AppBarLayout
 import com.tavish.musicplayerbeat.Adapters.PlayerPagerAdapter
 import com.tavish.musicplayerbeat.Common
-import com.tavish.musicplayerbeat.Helpers.*
+import com.tavish.musicplayerbeat.Helpers.RequestPermissionHandler
+import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
+import com.tavish.musicplayerbeat.Helpers.SongManager
+import com.tavish.musicplayerbeat.Helpers.binder
 import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
 import com.tavish.musicplayerbeat.Utils.Constants
-import kotlinx.coroutines.*
-import java.lang.Runnable
+import com.yarolegovich.discretescrollview.DiscreteScrollView
+import com.yarolegovich.discretescrollview.InfiniteScrollAdapter
+import com.yarolegovich.discretescrollview.transform.ScaleTransformer
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_mplayer.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
-class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
+class MPlayerActivity : AppCompatActivity(), View.OnClickListener{
 
 
+    private var wrapper: InfiniteScrollAdapter<*>? = null
     // private val cardView_hidden by binder<CardView>(R.id.cv_mplayer_hidden)
     private val cardView_main by binder<CardView>(R.id.cv_mplayer_main)
     private val btn_next by binder<ImageButton>(R.id.btn_next)
     private val img_play_pause by binder<ImageView>(R.id.img_play_pause)
+    private val rr_play_pause by binder<RelativeLayout>(R.id.ll_play_pause)
+    private val btn_repeat by binder<ImageButton>(R.id.btn_repeat)
+    private val btn_equalizer by binder<ImageButton>(R.id.btn_equalizer)
+   // private val toolbar by binder<Toolbar>(R.id.toolbar)
+    private lateinit var tv_tb_song_title: AppCompatTextView
 
-    private val ll_play_pause by binder<LinearLayoutCompat>(R.id.ll_play_pause)
+    private var mCompositeDisposable: CompositeDisposable? = null
 
 
     private val tv_current_duration by binder<TextView>(R.id.songCurrentDurationLabel)
+
+
     private val tv_total_duration by binder<TextView>(R.id.songTotalDurationLabel)
-
-
     private val mSeekBar by binder<SeekBar>(R.id.seekBar1)
 
-    private val mToolBar by binder<Toolbar>(R.id.toolbar)
 
-    private val mAppBarLayout by binder<AppBarLayout>(R.id.id_toolbar_container)
+   // private val mToolBar by binder<Toolbar>(R.id.toolbar)
 
+   // private val mAppBarLayout by binder<AppBarLayout>(R.id.id_toolbar_container)
 
     //private val view_custom_toolbar by binder<View>(R.id.custom_toolbar)
     lateinit var readWriteSongPermissionHandler: RequestPermissionHandler
+
+
     var songList: MutableList<BeatDto> = mutableListOf()
     lateinit var songManager: SongManager
-
-
     var sharedPreferences: SharedPreferences? = null
-    lateinit var editor: SharedPreferences.Editor
-    var file = Environment.getDataDirectory()
-    val storage_check_pref = "intent_memory"
-    val song_list_pref = "intent_songs"
-    var current_memory: Float = 0.0f
+
 
     var mFragments: MutableList<Fragment>? = null
+
     var mSongs: MutableList<SongDto>? = null
-
-
     private var mHandler: Handler? = null
-    private var mViewPagerAdapter: PlayerPagerAdapter? = null
-    private var mViewPager: ViewPager? = null
 
 
+    private var mRecyclerViewPagerAdapter: PlayerPagerAdapter? = null
+    //     private var mViewPager: ViewPager? = null
+    private var mSongViewer: DiscreteScrollView? = null
     // Application Context
     private var mApp: Common? = null
+
     private var mContext: Context? = null
     private var isUserScroll = true
-
-    private var jobStart: Job? = null
-
-
-    companion object {
-        val mediaPlayer: MediaPlayer = MediaPlayer()
-    }
+    private var shuffleFlag: Int? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mplayer)
 
-        mFragments = mutableListOf()
+     /*   getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.content, CurrentPlayingBottomBarFragment())
+                .commit()*/
+
+       // mFragments = mutableListOf()
+        postponeEnterTransition()
+
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window?.sharedElementEnterTransition = TransitionInflater.from(this).inflateTransition(
+                android.R.transition.move
+            )
+            window?.sharedElementEnterTransition?.duration=300
+        }*/
+        mFragments=mutableListOf()
         mContext = applicationContext
+        mCompositeDisposable= CompositeDisposable()
+
+       // tv_tb_song_title = toolbar.findViewById(R.id.tv_tb_song_title)
+        tv_tb_song_title = findViewById(R.id.tv_tb_song_title)
+        /* if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.SHUFFLE_MODE,Constants.SHUFFLE_OFF)==Constants.SHUFFLE_ON)
+         shuffleFlag=1*/
         mApp = mContext as Common
         if (mApp?.isServiceRunning()!!) {
             mSongs = mApp?.mService?.getSongList()
@@ -97,15 +123,12 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             mSongs = mApp?.getDBAccessHelper()?.getQueue()
         }
 
+
         mHandler = Handler()
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mViewPager = findViewById(R.id.viewPager)
-
-
-
-
+        mSongViewer = findViewById(R.id.viewPager)
 
         initViewPager()
 
@@ -117,19 +140,32 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
               }
           })*/
 
-        val params = mAppBarLayout.getLayoutParams() as RelativeLayout.LayoutParams
+        /*setSupportActionBar(mToolBar)
+        supportActionBar?.let {
+            it.setDisplayShowTitleEnabled(false)
+            it.setDisplayHomeAsUpEnabled(true)
+        }*/
+
+       // mToolBar.setNavigationOnClickListener {onBackPressed()}
+
+
+      /*  val params = mAppBarLayout.layoutParams as RelativeLayout.LayoutParams
         params.topMargin = Common.getStatusBarHeight(this)
         params.bottomMargin = 0
-        mAppBarLayout.layoutParams = params
+        mAppBarLayout.layoutParams = params*/
 
-        ll_play_pause.setOnClickListener(this)
+        rr_play_pause.setOnClickListener(this)
+        btn_next.setOnClickListener(this)
+        btn_prev.setOnClickListener(this)
+        btn_repeat.setOnClickListener(this)
+        btn_equalizer.setOnClickListener(this)
+
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
 
-        mViewPagerAdapter = null
+        mRecyclerViewPagerAdapter = null
         Log.d("DESTROYED", "DESTROYED")
 
     }
@@ -143,10 +179,10 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                 if (mApp?.isServiceRunning()!!) {
                     if (mApp?.mService?.isMusicPlaying()!!) {
                         animatePauseToPlay()
-                        mHandler?.removeCallbacks(seekBarUpdateRunnable)
+                        mHandler?.removeCallbacks (seekBarUpdateRunnable)
                     } else {
                         animatePlayToPause()
-                        mHandler?.post(seekBarUpdateRunnable)
+                        mHandler?.post (seekBarUpdateRunnable)
                     }
                 } else {
                     animatePlayToPause()
@@ -160,36 +196,156 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                          return null
                      }
                  }*/
-                mApp?.getPlayBackStarter()?.playPauseFromBottomBar()
+                CoroutineScope(Dispatchers.Main).launch {
+                    mApp?.getPlayBackStarter()?.playPauseFromBottomBar()
+                }
+
 
             }
 
             R.id.btn_next -> {
+                var newPos = mSongViewer?.currentItem?.plus(1)
+                //   var newPos = wrapper?.getRealPosition(mSongViewer?.currentItem?.plus(1)!!)
+                if (newPos!! < mRecyclerViewPagerAdapter?.itemCount!!) {
+                    //  mViewPager?.setCurrentItem(newPos, true)
+                    mSongViewer?.smoothScrollToPosition(newPos)
 
+                } else {
+                    if (mApp?.getSharedPrefHelper()?.getInt(
+                            SharedPrefHelper.Key.REPEAT_MODE,
+                            Constants.REPEAT_OFF
+                        ) == Constants.REPEAT_PLAYLIST
+                    )
+                        mSongViewer?.scrollToPosition(0)
+                    else
+                        Toast.makeText(mContext, "No Songs to Skip.", Toast.LENGTH_SHORT).show()
+                }
+                SharedPrefHelper.getInstance()
+                    .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, 0)
 
             }
 
+            R.id.btn_prev -> {
+                // var newPos = mViewPager?.currentItem?.minus(1)
+                var newPos = mSongViewer?.currentItem?.minus(1)
+                if (newPos!! > -1) {
+                    mSongViewer?.smoothScrollToPosition(newPos)
 
+                    //   mSongViewer?.addScrollStateChangeListener(mPageChangeListener)
+                } else {
+                    // doubt in this line
+                    //mViewPager?.setCurrentItem(0,false)
+                    mSongViewer?.smoothScrollToPosition(0)
+                }
+                SharedPrefHelper.getInstance()
+                    .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, 0)
+            }
+            R.id.btn_repeat -> {
+                when (SharedPrefHelper.getInstance().getInt(
+                    SharedPrefHelper.Key.REPEAT_MODE,
+                    Constants.REPEAT_OFF
+                )) {
+                    Constants.REPEAT_OFF -> {
+                        if (mApp?.isServiceRunning()!!) {
+                            mApp?.mService?.setOriginalOne()
+                        }
+                        SharedPrefHelper.getInstance()
+                            .put(SharedPrefHelper.Key.REPEAT_MODE, Constants.REPEAT_PLAYLIST)
+                    }
+
+                    Constants.REPEAT_PLAYLIST -> SharedPrefHelper.getInstance().put(
+                        SharedPrefHelper.Key.REPEAT_MODE,
+                        Constants.REPEAT_SONG
+                    )
+                    Constants.REPEAT_SONG -> SharedPrefHelper.getInstance().put(
+                        SharedPrefHelper.Key.REPEAT_MODE,
+                        Constants.SHUFFLE_ON
+                    )
+                    Constants.SHUFFLE_ON -> SharedPrefHelper.getInstance().put(
+                        SharedPrefHelper.Key.REPEAT_MODE,
+                        Constants.REPEAT_OFF
+                    )
+                }
+                repeatButton()
+            }
+
+            R.id.btn_equalizer -> {
+                val intent = Intent(this, EqualizerActivity::class.java)
+                startActivity(intent)
+
+            }
+
+            /*  R.id.btn_shuffle ->{
+                  if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.SHUFFLE_MODE, Constants.SHUFFLE_OFF)== Constants.SHUFFLE_OFF){
+                      if(mApp?.isServiceRunning()!!){
+                          mApp?.mService?.setShuffledOne()
+                          shuffleFlag=1
+                      }
+                      SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SHUFFLE_MODE,Constants.SHUFFLE_ON)
+                  }else{
+                      if (mApp?.isServiceRunning()!!){
+                          mApp?.mService?.setOriginalOne()
+                          shuffleFlag=2
+                      }
+                      SharedPrefHelper.getInstance().put(SharedPrefHelper.Key.SHUFFLE_MODE,Constants.SHUFFLE_OFF)
+                  }
+
+               //   shuffleButton()
+              }*/
         }
     }
+
+    fun repeatButton() {
+        when (SharedPrefHelper.getInstance().getInt(
+            SharedPrefHelper.Key.REPEAT_MODE,
+            Constants.REPEAT_OFF
+        )) {
+            Constants.REPEAT_OFF -> btn_repeat.setImageResource(R.drawable.btn_repeat_off)
+            Constants.REPEAT_PLAYLIST -> btn_repeat.setImageResource(R.drawable.btn_repeat)
+            Constants.REPEAT_SONG -> btn_repeat.setImageResource(R.drawable.btn_repeat_once)
+            Constants.SHUFFLE_ON -> btn_repeat.setImageResource(R.drawable.btn_shuffle_on)
+        }
+
+    }
+
+    /* fun shuffleButton(){
+         if(SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.SHUFFLE_MODE,Constants.SHUFFLE_OFF)==Constants.SHUFFLE_OFF)
+             btn_shuffle.setImageResource(R.drawable.btn_shuffle_off)
+         //to change :: else part
+         else
+             btn_shuffle.setImageResource(R.drawable.btn_shuffle_on)
+     }*/
 
     var mUpdateUIReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.hasExtra(Constants.UPDATE_UI)!!) {
                 try {
+                    /* if(shuffleFlag!!.equals(1)){
+                         mSongViewer?.adapter = mRecyclerViewPagerAdapter
+                         shuffleFlag =0
+                     }*/
+                    //Bug Line
                     var newPos = mApp?.mService?.mSongPos
-                    var currentPos = mViewPager?.currentItem
-                    if(currentPos != newPos){
-                        if(newPos!! > 0 && Math.abs(newPos-currentPos!!) <=5){
-                            /*scrollViewPager(newPosition, true, 1, false)*/
-                        }else{
-                            mViewPager?.setCurrentItem(newPos, false)
+
+                    mRecyclerViewPagerAdapter?.notifyDataSetChanged()
+                    //  var currentPos = mViewPager?.currentItem
+                    var currentPos = mSongViewer?.currentItem
+                    if (currentPos != newPos) {
+                        if (newPos!! > 0 && Math.abs(newPos - currentPos!!) <= 5) {
+                            //  scrollViewPager(newPos, true, 1, false)
+                            // mViewPager?.setCurrentItem(newPos, true)
+                            mSongViewer?.smoothScrollToPosition(newPos)
+                        } else {
+                            // mViewPager?.setCurrentItem(newPos, false)
+                            mSongViewer?.scrollToPosition(newPos)
                         }
 
-                        mSeekBar.max  = mApp?.mService?.mMediaPlayer1?.duration?.div(1000)!!
-                        mSeekBar.progress = 0
-
+                        if (mApp?.mService != null && mApp?.mService?.mMediaPlayerPrepared!!) {
+                            var abc = mApp?.mService?.mMediaPlayer1?.currentPosition!!
+                            mSeekBar.max = abc.div(1000)
+                            mSeekBar.progress = 0
+                        }
 
                         /*if (songInfoBottomSheetDialog != null) {
                             songInfoBottomSheetDialog.getAdapter().notifyDataSetChanged()
@@ -197,20 +353,29 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     mHandler?.post(seekBarUpdateRunnable)
                     img_play_pause.setImageResource(R.drawable.pause)
+
+
                 } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
-            }else if(intent.hasExtra(Constants.ACTION_PLAY_PAUSE)){
-                if(mApp?.isServiceRunning()!!){
-                    if(mApp?.mService?.isMusicPlaying()!!){
+            } else if (intent.hasExtra(Constants.ACTION_PLAY_PAUSE)) {
+                if (mApp?.isServiceRunning()!!) {
+                    if (mApp?.mService?.isMusicPlaying()!!) {
                         img_play_pause.setImageResource(R.drawable.pause)
-                        mHandler?.removeCallbacks(seekBarUpdateRunnable)
-                    }else{
+                        mHandler?.post { seekBarUpdateRunnable }
+                       //  mHandler?.removeCallbacks(seekBarUpdateRunnable)
+                    } else {
                         img_play_pause.setImageResource(R.drawable.play)
-                        mHandler?.post(seekBarUpdateRunnable)
+                      //  mHandler?.post(seekBarUpdateRunnable)
+                        mHandler?.removeCallbacks { seekBarUpdateRunnable }
                     }
                 }
             }
-            tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
+            tv_tb_song_title.text = mApp?.mService?.mSong?._title
+
+            if (mApp?.mService != null && mApp?.mService?.mMediaPlayerPrepared!!)
+                tv_total_duration.text =
+                    Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
         }
 
 
@@ -228,36 +393,46 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onResume() {
+     //   loadData()
+    //    initViewPager()
         super.onResume()
-
-
+        registerReceiver(mUpdateUIReceiver, IntentFilter(Constants.ACTION_UPDATE_NOW_PLAYING_UI))
         if (mApp?.isServiceRunning()!!) {
             if (mApp?.mService?.isMusicPlaying()!!) {
                 img_play_pause.setImageResource(R.drawable.pause)
-                mHandler?.post(seekBarUpdateRunnable)
+                mHandler?.post (seekBarUpdateRunnable)
             } else {
                 img_play_pause.setImageResource(R.drawable.play)
                 mHandler?.removeCallbacks(seekBarUpdateRunnable)
             }
         } else {
             img_play_pause.setImageResource(R.drawable.play)
+            //  initViewPager()
+
         }
-
-
+        repeatButton()
+        // shuffleButton()
     }
 
 
-    var seekBarUpdateRunnable: Runnable = object : Runnable {
+
+
+    var seekBarUpdateRunnable = object : Runnable {
         override fun run() {
             try {
-                val currentPosition = mApp?.mService?.mMediaPlayer1?.currentPosition
-                val currentPositionInSecs = (currentPosition?.div(1000)) as Int
-                mSeekBar.progress = currentPositionInSecs
+                if (mApp?.mService != null && mApp?.mService?.mMediaPlayerPrepared!!) {
+                    var  currentPosition = mApp?.mService?.mMediaPlayer1?.currentPosition!!
+                    val currentPositionInSecs = (currentPosition.div(1000))
+                    mSeekBar.progress = currentPositionInSecs
 
-                tv_current_duration.text = Common.convertMillisToSecs(mSeekBar.progress.times(1000))
-                mHandler?.postDelayed(this, 100)
+                    tv_current_duration.text =
+                        Common.convertMillisToSecs(mSeekBar.progress.times(1000))
+                    mHandler?.postDelayed(this, 100)
+                }
+
+
             } catch (ex: Exception) {
-                ex.printStackTrace()
+                Log.i(ContentValues.TAG, "MPlayerActivity: seekbar  $ex")
             }
         }
     }
@@ -265,11 +440,14 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
     val onSeekBarChangeListener = object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             try {
-                if (mApp?.mService?.mMediaPlayerPrepared!!) {
+                if (mApp?.mService != null && mApp?.mService?.mMediaPlayerPrepared!!) {
                     val currentDuration = mApp?.mService?.mMediaPlayer1?.duration
-                    mSeekBar.max = currentDuration?.div(1000) as Int
-                    if(fromUser)
-                        mSeekBar.progress
+                    seekBar?.max = currentDuration?.div(1000) as Int
+                    if (fromUser) {
+                        seekBar?.progress
+                    }
+
+
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -281,10 +459,14 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            val seekBarPos = seekBar?.progress!!
+            if (mApp?.isServiceRunning()!!)
+                mApp?.mService?.mMediaPlayer1?.seekTo(seekBarPos.times(1000))
 
         }
 
     }
+
 
     private fun animatePauseToPlay() {
         playPauseGame(R.drawable.play)
@@ -366,19 +548,52 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initViewPager() {
         try {
+            var abcd  = intent?.extras?.getParcelableArrayList<SongDto>("data")
             //  mViewPager?.visibility = View.INVISIBLE
-            mViewPagerAdapter = PlayerPagerAdapter(this, supportFragmentManager)
-            mViewPager?.apply {
-                adapter = mViewPagerAdapter
-                offscreenPageLimit = 0
-                addOnPageChangeListener(mPageChangeListener)
+            mRecyclerViewPagerAdapter = PlayerPagerAdapter(this)
+            mSongViewer?.apply {
+                mSongViewer?.adapter = mRecyclerViewPagerAdapter
+                setOffscreenItems(3)
+                setItemTransitionTimeMillis(450)
+                setItemTransformer(ScaleTransformer.Builder().setMinScale(0.8f).build())
+                //  addScrollStateChangeListener(mPageChangeListener)
+                addOnItemChangedListener(mPageChangeListener)
+                //  addOnPageChangeListener(mPageChangeListener)
             }
-            tv_total_duration.text = Common.convertMillisToSecs(mApp?.mService?.mMediaPlayer1?.duration!!)
-            if (mApp?.isServiceRunning()!!)
-                mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
+
+
+            /* mViewPager?.apply {
+                 adapter = mRecyclerViewPagerAdapter
+               //  clipChildren=false
+                 offscreenPageLimit = 0
+
+                 addOnPageChangeListener(mPageChangeListener)
+                 //setPageTransformer(false, CarouselEffectTransformer(this@MPlayerActivity))
+             }*/
+            /*  val intent= Intent().extras
+              tv_tb_song_title.text = intent.getString("song_name")*/
+
+            //  LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, IntentFilter("song_dto"))
+            var pos: Int? = 0
+
+
+            if (mApp?.isServiceRunning()!!) {
+                mSongViewer?.scrollToPosition(mApp?.mService?.mSongPos!!)
+                tv_tb_song_title.text = mApp?.mService?.mSong?._title
+            }
+            //     mViewPager?.setCurrentItem(mApp?.mService?.mSongPos!!, false)
+
             else {
-                val pos = SharedPrefHelper.getInstance().getInt(SharedPrefHelper.Key.CURRENT_SONG_POSITION, 0)
-                mViewPager?.setCurrentItem(pos, false)
+                pos = SharedPrefHelper.getInstance()
+                    .getInt(SharedPrefHelper.Key.CURRENT_SONG_POSITION, 0)
+                mSongViewer?.scrollToPosition(pos)
+                tv_tb_song_title.text = mSongs!![pos]._title
+            }
+
+            var dur: Int? = 0
+            if (mApp?.mService != null && mApp?.mService?.mMediaPlayerPrepared!!) {
+                dur = mApp?.mService?.mMediaPlayer1?.duration!!
+                tv_total_duration.text = Common.convertMillisToSecs(dur)
             }
 
             /*  val fadeAnimation = FadeAnimation(mVelocityViewPager, 600, 0.0f, 1.0f, DecelerateInterpolator(2.0f))
@@ -388,47 +603,69 @@ class MPlayerActivity : AppCompatActivity(), View.OnClickListener {
             ex.printStackTrace()
         }
 
-        Handler().postDelayed({ mViewPager?.offscreenPageLimit = 10 }, 1000)
+        //Handler().postDelayed({ mSongViewer?.setOffscreenItems(3) }, 500)
 
 
     }
 
-    val mPageChangeListener = object : ViewPager.OnPageChangeListener {
-        override fun onPageScrollStateChanged(scrollState: Int) {
-            if (scrollState == ViewPager.SCROLL_STATE_DRAGGING) isUserScroll = true
-        }
+    fun addFragment(fragment: Fragment) {
 
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size !== 1) {
-                if (positionOffset == 0.0f && position != mApp?.mService?.mSongPos) {
-                    if (isUserScroll) {
-                        mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(position) }, 200)
-                    }
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.rr_mplayer, fragment).addToBackStack(null) // to be added frag parent layout
+        fragmentTransaction.commit()
+
+        mFragments?.add(fragment)
+    }
+
+
+    /*  var mBroadcastReceiver= object: BroadcastReceiver() {
+          override fun onReceive(context: Context?, intent: Intent?) {
+             val name = intent?.getStringExtra("song_name")
+              tv_tb_song_title.text = name
+          }
+      }*/
+
+
+    /* val mPageChangeListener = object :DiscreteScrollView.ScrollStateChangeListener<PlayerPagerAdapter.SongPickerViewHolder> {
+         override fun onScroll(
+             position: Float,
+             p1: Int,
+             p2: Int,
+             p3: PlayerPagerAdapter.SongPickerViewHolder?,
+             p4: PlayerPagerAdapter.SongPickerViewHolder?
+         ) {
+             if(position==1.0f|| position==-1.0f||position==0.0f)
+                 USER_SCROLL=true
+         }
+
+         override fun onScrollEnd(p0: PlayerPagerAdapter.SongPickerViewHolder, pos: Int) {
+             if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size != 1) {
+                 if (pos != mApp?.mService?.mSongPos) {
+                     if(USER_SCROLL!!)
+                     mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 500)
+
+                 }
+             }
+         }
+
+         override fun onScrollStart(p0: PlayerPagerAdapter.SongPickerViewHolder, pos: Int) {
+         }
+     }*/
+
+    val mPageChangeListener =
+        DiscreteScrollView.OnItemChangedListener<PlayerPagerAdapter.SongPickerViewHolder> { p0, pos ->
+            if (mApp?.isServiceRunning()!! && mApp?.mService?.getSongList()?.size != 1) {
+                if (pos != mApp?.mService?.mSongPos) {
+                    mApp?.mService?.setSelectedSong(pos)
+                    SharedPrefHelper.getInstance()
+                        .put(SharedPrefHelper.Key.SONG_CURRENT_SEEK_DURATION, 0)
+                   //  mHandler?.postDelayed({ mApp?.mService?.setSelectedSong(pos) }, 200)
                 }
             }
         }
 
-        override fun onPageSelected(position: Int) {
 
-        }
-
-
-    }
-
-
-    fun toolbarClick(view: View) {
-        when (view.id) {
-            /*  R.id.btn_back ->  { val intent= Intent(this, MainActivity::class.java)
-                  startActivity(intent)}*/
-        }
-    }
-
-    fun slideUp(view: View) {
-        var animate = TranslateAnimation(0f, 0f, (view.height).toFloat(), 0f);
-        animate.setDuration(500);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
-    }
 
 
 }

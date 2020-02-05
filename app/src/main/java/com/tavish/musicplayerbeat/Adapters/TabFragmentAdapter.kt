@@ -14,7 +14,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getSystemService
 
-public class TabFragmentAdapter(fm: FragmentManager, pageTitles: Array<String>) : FragmentPagerAdapter(fm) {
+class TabFragmentAdapter(fm: FragmentManager, pageTitles: Array<String>) : FragmentPagerAdapter(fm) {
 
     private lateinit var mFragmentTags: SparseArray<String>
     private  var mFragmentManager: FragmentManager = fm
@@ -28,24 +28,24 @@ public class TabFragmentAdapter(fm: FragmentManager, pageTitles: Array<String>) 
         fragments= arrayListOf()
         mFragmentTags= SparseArray()
         for (tab in mPageTile) {
-            if (tab.equals("ALBUMS", ignoreCase = true)) {
+            if (tab.equals("Albums", ignoreCase = true)) {
                 fragments.add(AlbumFragment())
-            } else if (tab.equals("ARTISTS", ignoreCase = true)) {
+            } else if (tab.equals("Artists", ignoreCase = true)) {
                 fragments.add(ArtistFragment())
-            } else if (tab.equals("PLAYLISTS", ignoreCase = true)) {
+            } else if (tab.equals("Playlists", ignoreCase = true)) {
                 fragments.add(PlaylistFragment())
-            } else if (tab.equals("SONGS", ignoreCase = true)) {
+            } else if (tab.equals("Songs", ignoreCase = true)) {
                 fragments.add(SongFragment())
-            } else if (tab.equals("MYFILES", ignoreCase = true)) {
+            } else if (tab.equals("MyFiles", ignoreCase = true)) {
                 fragments.add(MyFileFragment())
-            } else if (tab.equals("GENRES", ignoreCase = true)) {
+            } else if (tab.equals("Genres", ignoreCase = true)) {
                 fragments.add(GenreFragment())
             }
         }
     }
 
     override fun getItem(position: Int): Fragment {
-        return fragments.get(position)
+        return fragments[position]
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -63,13 +63,12 @@ public class TabFragmentAdapter(fm: FragmentManager, pageTitles: Array<String>) 
     }
 
 
-
     override fun getPageTitle(position: Int): CharSequence? {
         return mPageTile[position]
     }
 
     override fun getCount(): Int {
-        return 6
+        return mPageTile.size
     }
 
 

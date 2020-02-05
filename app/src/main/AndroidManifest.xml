@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.tavish.musicplayerbeat">
+        package="com.tavish.musicplayerbeat">
 
     <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
 
     <application
             android:name=".Common"
@@ -16,23 +19,20 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppBaseTheme">
+        <activity android:name=".Activities.EqualizerActivity"></activity>
         <activity android:name=".Activities.SplashActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BeatMusicLibrary">
-        </activity>
-        <activity android:name=".Activities.MPlayerActivity"
-                  android:launchMode="singleTask">
-
-        </activity>
-        <activity android:name=".Activities.MainActivity">
-        </activity>
-
-
+        <activity android:name=".BeatMusicLibrary"></activity>
+        <activity android:name=".Activities.SearchActivity"></activity>
+        <activity
+                android:name=".Activities.MPlayerActivity"
+                android:launchMode="singleTask"></activity>
+        <activity android:name=".Activities.MainActivity"></activity>
 
         <receiver android:name=".BroadcastReceivers.NotificationBroadcastReceiver">
             <intent-filter>
@@ -42,6 +42,7 @@
                 <action android:name="com.tavish.musicplayerbeat.action.STOP" />
             </intent-filter>
         </receiver>
+
 
 
         <service android:name=".Helpers.MediaHelpers.MusicService">

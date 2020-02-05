@@ -9,6 +9,11 @@
         <item name="android:textColorPrimary">@color/light_brown</item>
         <item name="android:textColor">@color/light_brown</item>
         <item name="android:windowBackground">@color/velvet_white</item>
+        <item name="android:windowContentTransitions">true</item>
+
+
+       <!-- <item name="android:windowEnterTransition">@transition/change_image_transform</item>
+        <item name="android:windowExitTransition">@transition/auto_transition</item>-->
 
         <!--Text color-->
         <!-- <item name="bg_color">@color/velvet_white</item>
@@ -36,6 +41,13 @@
         <item name="button_color">@color/bright_orange</item>
         <item name="android:fontFamily">@font/opensansregular</item>-->
 
+    </style>
+
+    <style name="MyTitleStyle" parent="android:Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/velvet_white</item>
     </style>
 
     

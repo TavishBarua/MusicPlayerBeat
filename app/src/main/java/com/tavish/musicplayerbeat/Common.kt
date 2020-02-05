@@ -1,12 +1,14 @@
 package com.tavish.musicplayerbeat
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Resources
 import androidx.annotation.NonNull
 import androidx.multidex.MultiDexApplication
 import com.tavish.musicplayerbeat.DB.DBHelper
 import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicService
 import com.tavish.musicplayerbeat.Helpers.PlaybackHelper.Playback
+import com.tavish.musicplayerbeat.Helpers.SharedPrefHelper
 import com.tavish.musicplayerbeat.Models.AlbumDto
 import com.tavish.musicplayerbeat.Models.ArtistDto
 import com.tavish.musicplayerbeat.Models.SongDto
@@ -187,8 +189,6 @@ class Common: MultiDexApplication() {
             return output
 
         }
-
-
      }
      override fun onCreate() {
          super.onCreate()
@@ -199,14 +199,6 @@ class Common: MultiDexApplication() {
      }
 
 
-
-
-
-
-
-
-
-
      fun isServiceRunning(): Boolean {
          return mIsServiceRunning
      }
@@ -215,6 +207,9 @@ class Common: MultiDexApplication() {
          mIsServiceRunning = running
      }
 
+    fun getSharedPrefHelper():SharedPrefHelper{
+            return SharedPrefHelper.getInstance()
+    }
 
 
 

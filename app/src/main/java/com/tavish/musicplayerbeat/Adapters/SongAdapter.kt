@@ -19,7 +19,19 @@ import com.tavish.musicplayerbeat.Activities.MainActivity
 import com.tavish.musicplayerbeat.Common
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.Utils.MusicUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.ArrayList
+import android.view.animation.AlphaAnimation
+import android.R.attr.animation
+import android.app.Activity
+import android.os.Parcelable
+import android.util.Log
+
+import android.view.animation.TranslateAnimation
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
 
 
 class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
@@ -27,12 +39,6 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
     var mContext: Context = context;
     val songList: MutableList<SongDto> = mutableListOf()
     private var mApp: Common? = mContext.applicationContext as? Common
-
-
-    companion object {
-        val mediaPlayer: MediaPlayer = MediaPlayer()
-    }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.placeholder_song_item, parent, false)
@@ -46,13 +52,21 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
     fun update(data: MutableList<SongDto>) {
         songList.clear()
         songList.addAll(data)
-        notifyDataSetChanged()
+        CoroutineScope(Dispatchers.Main).launch {
+            notifyDataSetChanged()
+        }
+
     }
 
     override fun onBindViewHolder(songViewHolder: SongViewHolder, pos: Int) {
 
+        songViewHolder.itemView.img_song.transitionName="song_image$pos"
         //  myViewHolder.itemView.txt_title.isSelected=true
         songViewHolder.bindItems(songList[pos])
+        if(pos%2==0)
+            setAnimation(songViewHolder.itemView,-400f)
+        else
+            setAnimation(songViewHolder.itemView,400f)
 
     }
 
@@ -88,11 +102,26 @@ class SongAdapter(val context: Context) : RecyclerView.Adapter<SongAdapter.SongV
 
              }*/
             mApp?.getPlayBackStarter()?.playSongs(songList, adapterPosition)
-            mContext.startActivity(Intent(mContext, MPlayerActivity::class.java))
+            var intent = Intent(mContext, MPlayerActivity::class.java)
+            val pair = androidx.core.util.Pair<View,String>(v?.img_song, v?.img_song?.transitionName)
+            val options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(mContext as Activity, pair)
+            intent.putParcelableArrayListExtra("data",songList as ArrayList<out Parcelable>) // songlist shouldnt be send
+            Log.d("TRANS NAME",v?.img_song?.transitionName)
+            mContext.startActivity(intent,options.toBundle())
         }
 
 
 
+    }
+
+    private fun setAnimation(view: View, fromX: Float) {
+        val animation = TranslateAnimation(
+            fromX, 0.0f, 0.0f, 0.0f
+        )
+        animation.duration = 250
+        //animation.fillAfter = true
+        view.startAnimation(animation)
     }
 
 }

@@ -62,6 +62,12 @@ public class SharedPrefHelper(context: Context) {
         doCommit()
     }
 
+    fun put(key: Key, `val`: String) {
+        doEdit()
+        mEditor?.putString(key.name, `val`)
+        doCommit()
+    }
+
     fun getInt(key: Key): Int {
         return mPref.getInt(key.name, 0)
     }

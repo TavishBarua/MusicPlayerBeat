@@ -7,9 +7,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tavish.musicplayerbeat.Adapters.ArtistAdapter
 import com.tavish.musicplayerbeat.Common
@@ -18,6 +20,7 @@ import com.tavish.musicplayerbeat.Models.AlbumDto
 import com.tavish.musicplayerbeat.Models.ArtistDto
 
 import com.tavish.musicplayerbeat.R
+import com.tavish.musicplayerbeat.Utils.MusicUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -31,6 +34,7 @@ class ArtistFragment : Fragment() {
     lateinit var mArtistAdapter: ArtistAdapter
     private var mContext: Context? = null
     private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mFrameLayout: FrameLayout
     private var mApp:Common?=null
     private var compositeDisposable:CompositeDisposable?=null
     private lateinit var mView:View
@@ -58,6 +62,7 @@ class ArtistFragment : Fragment() {
         // Inflate the layout for this fragment
         val numberColumns=Common.getNumberOfColumns
         mView = inflater.inflate(R.layout.fragment_artist, container, false)
+        mFrameLayout = mView.findViewById(R.id.fl_frag_artist)
         mRecyclerView= mView.findViewById(R.id.rr_artists)
         mRecyclerView.layoutManager = GridLayoutManager(mContext, numberColumns)
         mRecyclerView.adapter=mArtistAdapter
@@ -89,6 +94,15 @@ class ArtistFragment : Fragment() {
                 }
             })
         )
+    }
+
+
+    fun removeFragment(){
+        MusicUtils.slideInFragmentAnimation(mFrameLayout,activity!!, this)
+    }
+
+    fun addFragment(){
+        MusicUtils.slideOutFragmentAnimation(mFrameLayout)
     }
 
     override fun onDestroy() {

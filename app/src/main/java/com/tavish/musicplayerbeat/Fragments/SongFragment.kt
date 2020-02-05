@@ -22,7 +22,9 @@ import com.tavish.musicplayerbeat.Models.BeatDto
 import com.tavish.musicplayerbeat.Helpers.SpacesItemDecoration
 import com.tavish.musicplayerbeat.Activities.MainActivity
 import com.tavish.musicplayerbeat.Common
+import com.tavish.musicplayerbeat.Helpers.Listeners.HideSheetScrollListeners
 import com.tavish.musicplayerbeat.Helpers.MediaHelpers.MusicCursor
+import com.tavish.musicplayerbeat.Interfaces.IScrollListener
 import com.tavish.musicplayerbeat.Models.SongDto
 import com.tavish.musicplayerbeat.R
 import io.reactivex.Observable
@@ -38,8 +40,6 @@ class SongFragment : Fragment(){
 
 
  //   lateinit var mRecyclerView:RecyclerView
-
-
     lateinit var songManager: SongManager
     var file=Environment.getDataDirectory()
 
@@ -53,6 +53,7 @@ class SongFragment : Fragment(){
     private val COMMON_TAG : String = "CombinedLifeCycle"
     private val FRAGMENT_NAME : String? = SongFragment::class.simpleName
     private val TAG : String = COMMON_TAG
+    private var mOnScrollListener:IScrollListener?=null
 
     private var mCompositeDisposable: CompositeDisposable? = null
     private lateinit var mContext: Context
@@ -69,14 +70,29 @@ class SongFragment : Fragment(){
     ): View? {
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_song, container, false)
-        recyclerView= view.findViewById(R.id.rr_songs)
+       /* recyclerView= view.findViewById(R.id.rr_songs)
         recyclerView.layoutManager= LinearLayoutManager(activity,RecyclerView.VERTICAL,false)
         songAdapter = SongAdapter(mContext)
-        recyclerView.adapter=songAdapter
+        recyclerView.adapter=songAdapter*/
 
+        recyclerView.run {
+            recyclerView= findViewById(R.id.rr_songs)
+            layoutManager = LinearLayoutManager(activity,RecyclerView.VERTICAL,false)
+            songAdapter = SongAdapter(mContext)
+            adapter =songAdapter
 
+            addOnScrollListener(object:HideSheetScrollListeners(){
+                override fun onHide() {
+                    mOnScrollListener?.scrollUp()
+                }
 
-        Log.i(TAG,FRAGMENT_NAME+" onCreateView")
+                override fun onShow() {
+                    mOnScrollListener?.scrollDown()
+                }
+            })
+        }
+
+        Log.i(TAG, "$FRAGMENT_NAME onCreateView")
         return view
     }
 
@@ -87,6 +103,7 @@ class SongFragment : Fragment(){
         mCompositeDisposable= CompositeDisposable()
         mCommon = mContext.applicationContext as Common
         songList= mutableListOf()
+
 
     }
 
@@ -118,9 +135,17 @@ class SongFragment : Fragment(){
         super.onResume()
     }
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is MainActivity){
+            mOnScrollListener = context
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
         mCompositeDisposable?.dispose()
+        mOnScrollListener=null
     }
 
 /*
